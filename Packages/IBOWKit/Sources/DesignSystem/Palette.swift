@@ -46,6 +46,11 @@ public nonisolated enum Palette {
     public static let red = RGB(hex: 0xF87171)
     public static let magenta = RGB(hex: 0xC084FC)
     public static let error = RGB(hex: 0xEF4444)
+    // Illustration colours (icons)
+    public static let illusCyan = RGB(hex: 0x67E8F9)
+    public static let illusOrange = RGB(hex: 0xFB923C)
+    public static let illusGreen = RGB(hex: 0x4ADE80)
+    public static let illusViolet = RGB(hex: 0xC084FC)
 
     /// Secondary text (white @ 60 %) over the base surface.
     public static let secondaryTextOnSurface = white.over(surface, alpha: 0.60)

@@ -1,24 +1,27 @@
 import SwiftUI
 
-/// Dark base with three blurred colour blobs. Static when Reduce Motion is on (it is always static here;
-/// blobs never animate, which also keeps battery cost at zero).
+/// Dark base with three blurred colour blobs, positioned and tinted as in the design
+/// (cyan top-right, indigo mid-left, blue bottom-right). Static: no animation, no battery cost.
 public struct AtmosphericBackground: View {
     public init() {}
 
     public var body: some View {
-        ZStack {
-            DS.Color.surface
-            GeometryReader { proxy in
-                let w = proxy.size.width, h = proxy.size.height
-                Circle().fill(Palette.atmosBlue.color.opacity(0.35))
-                    .frame(width: w * 0.9).blur(radius: 90).offset(x: -w * 0.35, y: -h * 0.12)
-                Circle().fill(Palette.atmosCyan.color.opacity(0.25))
-                    .frame(width: w * 0.7).blur(radius: 80).offset(x: w * 0.45, y: h * 0.25)
-                Circle().fill(Palette.atmosIndigo.color.opacity(0.28))
-                    .frame(width: w * 0.8).blur(radius: 90).offset(x: -w * 0.2, y: h * 0.75)
+        DS.Color.surface
+            .overlay(alignment: .topTrailing) {
+                blob(Palette.atmosCyan, opacity: 0.30, size: 280, blur: 90).offset(x: 90, y: -70)
             }
-        }
-        .ignoresSafeArea()
-        .accessibilityHidden(true)
+            .overlay(alignment: .topLeading) {
+                blob(Palette.atmosIndigo, opacity: 0.26, size: 260, blur: 90).offset(x: -120, y: 340)
+            }
+            .overlay(alignment: .bottomTrailing) {
+                blob(Palette.atmosBlue, opacity: 0.30, size: 280, blur: 100).offset(x: 100, y: 70)
+            }
+            .clipped()
+            .ignoresSafeArea()
+            .accessibilityHidden(true)
+    }
+
+    private func blob(_ color: RGB, opacity: Double, size: CGFloat, blur: CGFloat) -> some View {
+        Circle().fill(color.color.opacity(opacity)).frame(width: size, height: size).blur(radius: blur)
     }
 }
