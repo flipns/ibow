@@ -142,11 +142,14 @@ public struct DetailView: View {
         let value = vis.map { String(format: "%@%.1f km", $0.isLowerBound ? "≥ " : "", km) } ?? "—"
         return Tile(title: "Visibilidad", icon: "eye", tint: Palette.illusGreen, value: value,
                     caption: km >= 9.5 ? "Sin restricción" : nil,
+                    accessory: { MeterBar(fraction: km / 10, color: Palette.illusGreen) },
                     spoken: vis.map { "visibilidad \($0.isLowerBound ? "de al menos " : "")\(Int(km.rounded())) kilómetros" } ?? "visibilidad desconocida")
     }
 
     private var cloudsTile: some View {
-        Tile(title: "Nubes", icon: "cloud", tint: Palette.illusCyan, value: cloudsHeadline, caption: metar.clouds.isEmpty ? nil : cloudsText,
+        Tile(title: "Nubes", icon: "cloud", tint: Palette.illusCyan, value: cloudsHeadline,
+             caption: metar.clouds.isEmpty ? nil : cloudsText,
+             accessory: { CloudBars(layers: metar.clouds) },
              spoken: "nubes: \(cloudsText)")
     }
 
@@ -218,13 +221,20 @@ private struct TokenChip: View {
     }
 }
 
-private struct Tile: View {
+private struct Tile<Accessory: View>: View {
     let title: LocalizedStringKey
     let icon: String
     let tint: RGB
     let value: String
     let caption: String?
+    let accessory: Accessory
     let spoken: String
+
+    init(title: LocalizedStringKey, icon: String, tint: RGB, value: String, caption: String?,
+         @ViewBuilder accessory: () -> Accessory, spoken: String) {
+        self.title = title; self.icon = icon; self.tint = tint; self.value = value
+        self.caption = caption; self.accessory = accessory(); self.spoken = spoken
+    }
 
     var body: some View {
         GlassCard {
@@ -233,6 +243,7 @@ private struct Tile: View {
                     .font(DS.Typography.labelSmall).foregroundStyle(DS.Color.onSurfaceVariant)
                 Text(value).font(DS.Typography.numeral).foregroundStyle(DS.Color.onSurface)
                     .minimumScaleFactor(0.7).lineLimit(1)
+                accessory.accessibilityHidden(true)   // decorative: the same data is in the text
                 if let caption {
                     Text(caption).font(DS.Typography.caption).foregroundStyle(DS.Color.onSurfaceMuted)
                 }
@@ -240,5 +251,55 @@ private struct Tile: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(spoken)
+    }
+}
+
+extension Tile where Accessory == EmptyView {
+    init(title: LocalizedStringKey, icon: String, tint: RGB, value: String, caption: String?, spoken: String) {
+        self.init(title: title, icon: icon, tint: tint, value: value, caption: caption,
+                  accessory: { EmptyView() }, spoken: spoken)
+    }
+}
+
+/// Horizontal meter, 0…1.
+private struct MeterBar: View {
+    let fraction: Double
+    let color: RGB
+
+    var body: some View {
+        Capsule().fill(Color.white.opacity(0.12))
+            .frame(height: 8)
+            .overlay(alignment: .leading) {
+                GeometryReader { proxy in
+                    Capsule().fill(color.color)
+                        .frame(width: proxy.size.width * min(max(fraction, 0), 1))
+                }
+            }
+    }
+}
+
+/// One bar per cloud layer; length = how much of the sky it covers.
+private struct CloudBars: View {
+    let layers: [CloudLayer]
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            ForEach(Array(layers.enumerated()), id: \.offset) { _, layer in
+                MeterBar(fraction: layer.cover.coverage, color: Palette.illusCyan)
+            }
+        }
+    }
+}
+
+private extension CloudLayer.Cover {
+    var coverage: Double {
+        switch self {
+        case .clear: 0
+        case .few: 0.25
+        case .scattered: 0.5
+        case .broken: 0.75
+        case .overcast, .verticalVisibility: 1
+        case .unknown: 0
+        }
     }
 }
