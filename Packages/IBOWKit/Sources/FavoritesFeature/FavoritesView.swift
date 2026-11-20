@@ -14,32 +14,43 @@ public struct FavoritesView: View {
     }
 
     public var body: some View {
-        Group {
-            if viewModel.codes.isEmpty {
-                // HIG: an empty section explains why it is empty instead of being hidden or disabled.
-                ContentUnavailableView {
-                    Label("Sin favoritos", systemImage: "star")
-                } description: {
-                    Text("Toca la estrella en el detalle de un aeropuerto para tenerlo aquí.")
-                }
-                .foregroundStyle(DS.Color.onSurface)
-            } else {
-                list
-            }
+        List(selection: $selection) {
+            header.favoriteRow()
+            content
         }
+        .listStyle(.plain)
+        .scrollContentBackground(.hidden)
         .background { AtmosphericBackground() }
-        .navigationTitle("Favoritos")
+        .refreshable { await viewModel.refreshMetars() }
+        #if os(iOS)
+        .toolbar(.hidden, for: .navigationBar)   // same custom header as the search screen
+        #endif
         .task { await viewModel.load() }
     }
 
-    private var list: some View {
-        List(selection: $selection) {
+    private var header: some View {
+        VStack(alignment: .leading, spacing: DS.Spacing.xs) {
+            Text("Favoritos")
+                .font(DS.Typography.headlineLarge)
+                .foregroundStyle(DS.Color.onSurface)
+                .accessibilityAddTraits(.isHeader)
+            Text("Tus aeropuertos guardados")
+                .font(DS.Typography.bodyMedium)
+                .foregroundStyle(DS.Color.accentSoft)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.top, DS.Spacing.md)
+    }
+
+    @ViewBuilder private var content: some View {
+        if viewModel.codes.isEmpty {
+            // HIG: an empty section explains why it is empty instead of being hidden or disabled.
+            message("star", "Sin favoritos", "Toca la estrella en el detalle de un aeropuerto para tenerlo aquí.")
+                .favoriteRow()
+        } else {
             switch viewModel.state {
             case .failed(let error) where viewModel.favoriteMetars.isEmpty:
-                Text(Self.text(for: error))
-                    .font(DS.Typography.bodyMedium)
-                    .foregroundStyle(DS.Color.accentSoft)
-                    .favoriteRow()
+                message("exclamationmark.triangle", "No se pudo cargar", Self.text(for: error)).favoriteRow()
             case .loading where viewModel.favoriteMetars.isEmpty:
                 ProgressView().tint(DS.Color.primary)
                     .frame(maxWidth: .infinity).padding(DS.Spacing.lg)
@@ -52,9 +63,19 @@ public struct FavoritesView: View {
                 }
             }
         }
-        .listStyle(.plain)
-        .scrollContentBackground(.hidden)
-        .refreshable { await viewModel.refreshMetars() }
+    }
+
+    private func message(_ icon: String, _ title: String, _ detail: String) -> some View {
+        VStack(spacing: DS.Spacing.sm) {
+            Image(systemName: icon).font(.largeTitle).foregroundStyle(DS.Color.accentSoft)
+                .accessibilityHidden(true)
+            Text(title).font(DS.Typography.headlineSmall).foregroundStyle(DS.Color.onSurface)
+            Text(detail).font(DS.Typography.bodyMedium).foregroundStyle(DS.Color.accentSoft)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(DS.Spacing.lg)
+        .accessibilityElement(children: .combine)
     }
 
     static func text(for error: WeatherError) -> String {

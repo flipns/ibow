@@ -7,14 +7,21 @@ import WeatherDomain
 public struct MetarRow: View {
     let metar: Metar
     let isSelected: Bool
+    @Environment(\.horizontalSizeClass) private var sizeClass
 
     public init(metar: Metar, isSelected: Bool) {
         self.metar = metar
         self.isSelected = isSelected
     }
 
+    /// Selection is only meaningful while the detail is visible beside the list (regular width).
+    /// On compact width the list is replaced by the detail, and the selection lingers for a moment after
+    /// popping back: highlighting it caused a blue→grey flash. `.outlined` shares the standard padding,
+    /// so the content never shifts when the highlight appears or goes away.
+    private var isHighlighted: Bool { isSelected && sizeClass == .regular }
+
     public var body: some View {
-        GlassCard(isSelected ? .accent : .standard) {
+        GlassCard(isHighlighted ? .outlined : .standard) {
             VStack(alignment: .leading, spacing: DS.Spacing.sm) {
                 HStack(alignment: .firstTextBaseline) {
                     Text(metar.station.value)
