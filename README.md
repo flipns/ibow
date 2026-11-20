@@ -28,6 +28,8 @@ variados (viento, visibilidad, nubes, fenómenos, categoría de vuelo). Los DTO 
 - **Búsqueda**: uno o varios códigos separados por comas, con sugerencias rápidas.
 - **Detalle**: tarjeta de resumen con icono del tiempo, lector interactivo del METAR, rosa de los vientos,
   visibilidad, nubes, temperatura/rocío y QNH.
+- **Antigüedad del METAR**: «Observado a las 16:30 UTC · hace 12 min», que se actualiza cada minuto.
+- **Favoritos**: estrella en el detalle y pestaña propia, persistidos con SwiftData.
 - Pull-to-refresh, estados vacío / cargando / error con mensajes en lenguaje natural.
 
 ## Arquitectura
@@ -62,7 +64,8 @@ compilador sin el coste de mantener muchos `Package.swift`. En un proyecto mayor
 extraerse a su propio paquete sin cambiar sus fronteras.
 
 **Concurrencia estricta (Swift 6).** Domain y Data son `nonisolated` y `Sendable`; los módulos de UI usan
-aislamiento al main actor por defecto. Sin `@unchecked Sendable`.
+aislamiento al main actor por defecto. Sin `@unchecked Sendable`. Las escrituras de favoritos se encadenan para que
+lleguen al almacén en el orden de los toques (`rapidTogglesReachTheStoreInOrder`).
 
 **Caché (en memoria, por consulta, 3 min).**
 - `TTLCache` es un `actor` con **reloj inyectado**, así la expiración se prueba sin esperar.
@@ -76,6 +79,10 @@ aislamiento al main actor por defecto. Sin `@unchecked Sendable`.
 - Además hay una **generación** por búsqueda: aunque una petición ignorase la cancelación y terminara tarde,
   su resultado se descarta si ya no es la última. Nunca se pinta un resultado antiguo.
 - `CancellationError` y `URLError.cancelled` no se tratan como error visible.
+- **Cómo se verifica** (`SearchViewModelTests`, con un doble de búsqueda cuyas respuestas se liberan a mano desde el
+  test): `staleResponseNeverOverwritesNewerQuery` termina la búsqueda *antigua* después de la nueva y comprueba que
+  la pantalla sigue mostrando la nueva; `newQueryCancelsTheInFlightTask` comprueba que la petición anterior recibe
+  la cancelación; `cancellationIsNotShownAsAnError` y `debounceDelaysTheRequest` cubren el resto.
 
 **Navegación adaptable.** `NavigationSplitView` con `List(selection:)`: una columna en iPhone y pantalla
 exterior del iPhone Duo; dos columnas en la interior y en iPad. Sin código específico de dispositivo, solo clases
@@ -93,16 +100,21 @@ en las tarjetas porque el sistema de diseño define un cristal propio; la barra 
 - Contraste: los textos atenuados del diseño (blanco al 60 % y 40 %) no llegan a AA sobre las tarjetas tintadas
   y, además, la auditoría de Xcode no sabe medir texto semitransparente sobre degradados. Se sustituyen por un
   gris azulado opaco (`#CBD5E1`); un test comprueba ≥ 4,5:1 contra los fondos más claros posibles. El botón principal usa texto oscuro sobre el degradado por la misma razón.
-- Pendiente: automatizar una auditoría con `performAccessibilityAudit()` (ver limitaciones).
+- No se automatiza `performAccessibilityAudit()` (ver limitaciones); se verifica a mano con VoiceOver y Dynamic Type.
 
 ## Tests
 
 - **Domain**: validación de códigos, caso de uso con repositorio *mock*, tokenizador (incluye METAR reales).
 - **Data**: expiración y reemplazo de la caché con reloj inyectado, clave por consulta, errores no cacheados,
   decodificación contra un payload real capturado, mapeo de errores HTTP/red/cancelación.
-- **Presentation / Search**: respuestas obsoletas descartadas, cancelación, *debounce*, estados, textos del lector.
+- **Presentation / Search**: respuestas obsoletas descartadas, cancelación, *debounce*, estados, textos del lector,
+  antigüedad del METAR.
+- **Favoritos**: repositorio SwiftData en memoria y el *view model* (alternar, revertir si falla la escritura,
+  orden de escrituras rápidas).
+- **UI (XCTest, 2 tests)**: la pantalla de búsqueda aparece, y buscar LEMD y tocar el resultado abre el detalle.
+  La app se lanza con `-ui-testing`, que sustituye la red por datos fijos para que sean rápidos y deterministas.
 
-Framework: Swift Testing (XCTest solo para UI).
+Framework: Swift Testing para el paquete y la lógica; XCTest solo para UI.
 
 ## CI/CD
 
@@ -113,10 +125,12 @@ Framework: Swift Testing (XCTest solo para UI).
 
 ## Limitaciones y siguientes pasos
 
-- **Tests de UI / auditoría de accesibilidad automatizada**: se probó `performAccessibilityAudit()`, pero se descartó por
-  ahora; la accesibilidad se ha verificado con los tests de contraste y revisando VoiceOver y Dynamic Type a mano.
-
+- **Auditoría de accesibilidad automatizada**: se probó `performAccessibilityAudit()` en UI tests, pero se descartó
+  por ahora (no sabe medir contraste sobre texto semitransparente); la accesibilidad se ha verificado con los tests
+  de contraste y revisando VoiceOver y Dynamic Type a mano.
 - Caché en disco (SwiftData) como segundo nivel detrás de la de memoria.
+- Peticiones simultáneas idénticas: cada una va a la red (no hay *request coalescing*); no compensa en este alcance.
+- TAF (previsión) y comparación de dos aeropuertos, descartados para acotar la entrega.
 - Pestañas «Recientes» y «Ajustes» (unidades de viento/presión/temperatura) descartadas por ahora: el HIG pide pocas
   pestañas y ninguna a medio hacer.
 - Indicar en la UI si el dato viene de caché.
@@ -128,4 +142,4 @@ Framework: Swift Testing (XCTest solo para UI).
 El dominio define el puerto `FavoritesRepository`; `SwiftDataFavoritesRepository` (`@ModelActor`) lo implementa con su
 propio `ModelContext` fuera del hilo principal. El `@Model` es interno y no `Sendable`: solo cruzan `ICAOCode`.
 `FavoritesViewModel` es la única fuente de verdad (estrella del detalle y pestaña Favoritos): alterna de forma optimista
-y revierte si falla la escritura. Si el almacén no puede abrirse, la app cae a memoria en vez de cerrarse.
+y revierte si falla la escritura. Si el almacén no puede abrirse, la app usa un repositorio en memoria (`InMemoryFavoritesRepository`) en vez de cerrarse.
