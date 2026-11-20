@@ -37,6 +37,7 @@ de modo que **el compilador impide** las dependencias que no deben existir.
 
 ```
  IBOW (app)  ── raíz de composición: único sitio que conoce todos los tipos concretos
+   ├─ FavoritesFeature ┐
    ├─ SearchFeature ─┐
    ├─ DetailFeature ─┼─► WeatherPresentation ─► DesignSystem
    │                 └─► WeatherDomain ◄── WeatherData  (HTTP · DTO · caché)
@@ -45,10 +46,10 @@ de modo que **el compilador impide** las dependencias que no deben existir.
 | Target | Responsabilidad | Depende de |
 |---|---|---|
 | `WeatherDomain` | Entidades, puerto `WeatherRepository`, casos de uso, tokenizador de METAR | nada |
-| `WeatherData` | Cliente HTTP, DTO, repositorio remoto, caché TTL | Domain |
+| `WeatherData` | Cliente HTTP, DTO, repositorio remoto, caché TTL, favoritos en SwiftData (`@ModelActor`) | Domain |
 | `DesignSystem` | Tokens, Manrope, componentes de cristal | nada |
 | `WeatherPresentation` | Textos (incl. VoiceOver), explicador de grupos METAR, icono del tiempo | Domain, DesignSystem |
-| `SearchFeature` / `DetailFeature` | Pantallas | Domain, Presentation, DesignSystem |
+| `SearchFeature` / `DetailFeature` / `FavoritesFeature` | Pantallas (Favoritos incluye el estado compartido de la estrella) | Domain, Presentation, DesignSystem |
 
 ### Decisiones
 
@@ -115,8 +116,16 @@ Framework: Swift Testing (XCTest solo para UI).
 - **Tests de UI / auditoría de accesibilidad automatizada**: se probó `performAccessibilityAudit()`, pero se descartó por
   ahora; la accesibilidad se ha verificado con los tests de contraste y revisando VoiceOver y Dynamic Type a mano.
 
-- **Favoritos y Recientes** (pestañas aún vacías) con SwiftData: persistir favoritos y una caché en disco como
-  segundo nivel detrás de la de memoria.
+- Caché en disco (SwiftData) como segundo nivel detrás de la de memoria.
+- Pestañas «Recientes» y «Ajustes» (unidades de viento/presión/temperatura) descartadas por ahora: el HIG pide pocas
+  pestañas y ninguna a medio hacer.
 - Indicar en la UI si el dato viene de caché.
 - Soporte de iPhone Duo verificado con tamaños de clase; pendiente de probar en el simulador con el pliegue.
 - La API no devuelve pistas, por lo que no se calcula viento cruzado/de cara.
+
+## Favoritos (SwiftData)
+
+El dominio define el puerto `FavoritesRepository`; `SwiftDataFavoritesRepository` (`@ModelActor`) lo implementa con su
+propio `ModelContext` fuera del hilo principal. El `@Model` es interno y no `Sendable`: solo cruzan `ICAOCode`.
+`FavoritesViewModel` es la única fuente de verdad (estrella del detalle y pestaña Favoritos): alterna de forma optimista
+y revierte si falla la escritura. Si el almacén no puede abrirse, la app cae a memoria en vez de cerrarse.
