@@ -12,6 +12,7 @@
 		1DF8247530B066F300D5634A /* DesignSystem in Frameworks */ = {isa = PBXBuildFile; productRef = 1DF8247430B066F300D5634A /* DesignSystem */; };
 		1DF8247730B066F900D5634A /* DetailFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 1DF8247630B066F900D5634A /* DetailFeature */; };
 		1DF8247930B066FD00D5634A /* SearchFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 1DF8247830B066FD00D5634A /* SearchFeature */; };
+		1DF8247F30B09F4900D5634A /* FavoritesFeature in Frameworks */ = {isa = PBXBuildFile; productRef = 1DF8247E30B09F4900D5634A /* FavoritesFeature */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -62,6 +63,7 @@
 				1DF8247730B066F900D5634A /* DetailFeature in Frameworks */,
 				1DF8247930B066FD00D5634A /* SearchFeature in Frameworks */,
 				1DF8247530B066F300D5634A /* DesignSystem in Frameworks */,
+				1DF8247F30B09F4900D5634A /* FavoritesFeature in Frameworks */,
 				1D98A0DA30B043C900E2C419 /* WeatherData in Frameworks */,
 				1D98A0DC30B043C900E2C419 /* WeatherDomain in Frameworks */,
 			);
@@ -130,6 +132,7 @@
 				1DF8247430B066F300D5634A /* DesignSystem */,
 				1DF8247630B066F900D5634A /* DetailFeature */,
 				1DF8247830B066FD00D5634A /* SearchFeature */,
+				1DF8247E30B09F4900D5634A /* FavoritesFeature */,
 			);
 			productName = IBOW;
 			productReference = 1D98A0B030AF6A5D00E2C419 /* IBOW.app */;
@@ -616,6 +619,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 1D98A0D830B043C900E2C419 /* XCLocalSwiftPackageReference "Packages/IBOWKit" */;
 			productName = SearchFeature;
+		};
+		1DF8247E30B09F4900D5634A /* FavoritesFeature */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 1D98A0D830B043C900E2C419 /* XCLocalSwiftPackageReference "Packages/IBOWKit" */;
+			productName = FavoritesFeature;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -1,15 +1,19 @@
 import DesignSystem
 import DetailFeature
+import FavoritesFeature
 import SearchFeature
 import SwiftUI
 import WeatherDomain
 
-/// App shell: a tab bar whose first tab hosts the search/detail split view.
+/// App shell: Search and Favorites tabs, each hosting a list/detail split view.
 struct ContentView: View {
     @State private var viewModel: SearchViewModel
+    @State private var favorites: FavoritesViewModel
     @State private var selection: ICAOCode?
+    @State private var favoritesSelection: ICAOCode?
 
-    init(searchUseCase: SearchMetarsUseCase) {
+    init(searchUseCase: SearchMetarsUseCase, favorites: FavoritesViewModel) {
+        _favorites = State(initialValue: favorites)
         _viewModel = State(initialValue: SearchViewModel { query in
             try await searchUseCase(query: query)
         })
@@ -18,18 +22,7 @@ struct ContentView: View {
     var body: some View {
         TabView {
             Tab("Buscar", systemImage: "magnifyingglass") { searchTab }
-            Tab("Favoritos", systemImage: "star") {
-                PlaceholderTab(title: "Favoritos", systemImage: "star",
-                               message: "Guarda aeropuertos desde su detalle para verlos aquí.")
-            }
-            Tab("Recientes", systemImage: "clock") {
-                PlaceholderTab(title: "Recientes", systemImage: "clock",
-                               message: "Tus últimas búsquedas aparecerán aquí.")
-            }
-            Tab("Ajustes", systemImage: "slider.horizontal.3") {
-                PlaceholderTab(title: "Ajustes", systemImage: "slider.horizontal.3",
-                               message: "Unidades y preferencias, próximamente.")
-            }
+            Tab("Favoritos", systemImage: "star") { favoritesTab }
         }
         .tint(DS.Color.primary)
     }
@@ -41,12 +34,36 @@ struct ContentView: View {
             SearchView(viewModel: viewModel, selection: $selection)
         } detail: {
             if let metar = viewModel.metar(for: selection) {
-                DetailView(metar: metar)
-                    .id(metar.id)   // reset reader state when the selected airport changes
+                detail(metar)
             } else {
                 ContentUnavailableView("Selecciona un aeropuerto", systemImage: "airplane")
                     .background { AtmosphericBackground() }
             }
         }
+    }
+
+    private var favoritesTab: some View {
+        NavigationSplitView {
+            FavoritesView(viewModel: favorites, selection: $favoritesSelection)
+        } detail: {
+            if let metar = favorites.metar(for: favoritesSelection) {
+                detail(metar)
+            } else {
+                ContentUnavailableView("Selecciona un favorito", systemImage: "star")
+                    .background { AtmosphericBackground() }
+            }
+        }
+    }
+
+    private func detail(_ metar: Metar) -> some View {
+        DetailView(
+            metar: metar,
+            isFavorite: favorites.isFavorite(metar.station),
+            onToggleFavorite: {
+                favorites.remember(metar)
+                Task { await favorites.toggle(metar.station) }
+            }
+        )
+        .id(metar.id)   // reset reader state when the selected airport changes
     }
 }

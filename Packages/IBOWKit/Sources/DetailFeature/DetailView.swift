@@ -11,9 +11,14 @@ public struct DetailView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
 
     private let tokens: [METARToken]
+    private let isFavorite: Bool
+    private let onToggleFavorite: (() -> Void)?
 
-    public init(metar: Metar) {
+    /// `onToggleFavorite == nil` hides the star (the screen stays usable without a favorites store).
+    public init(metar: Metar, isFavorite: Bool = false, onToggleFavorite: (() -> Void)? = nil) {
         self.metar = metar
+        self.isFavorite = isFavorite
+        self.onToggleFavorite = onToggleFavorite
         // The leading "METAR" label adds nothing for the reader, so it is not offered as a chip.
         let tokens = METARTokenizer.tokenize(metar.rawText).filter { $0.text != "METAR" }
         self.tokens = tokens
@@ -35,6 +40,19 @@ public struct DetailView: View {
         .background { AtmosphericBackground() }
         .navigationTitle(metar.station.value)
         .navigationSubtitle(metar.displayName)
+        .toolbar {
+            if let onToggleFavorite {
+                // Primary action of the screen: the system keeps it at the top of the vertical axis on iPhone Duo.
+                ToolbarItem(placement: .primaryAction) {
+                    Button(action: onToggleFavorite) {
+                        Label(isFavorite ? "Quitar de favoritos" : "Añadir a favoritos",
+                              systemImage: isFavorite ? "star.fill" : "star")
+                    }
+                    .labelStyle(.iconOnly)
+                    .accessibilityAddTraits(isFavorite ? .isSelected : [])
+                }
+            }
+        }
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
