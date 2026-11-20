@@ -13,7 +13,7 @@ jobs:
   testflight:
     runs-on: xcode-27
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Archive
         run: |
           xcodebuild archive -project IBOW.xcodeproj -scheme IBOW \

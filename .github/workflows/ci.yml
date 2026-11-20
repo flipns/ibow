@@ -14,7 +14,7 @@ jobs:
     name: Package tests (IBOWKit)
     runs-on: xcode-27
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - run: swift --version
       - name: swift test
         working-directory: Packages/IBOWKit
@@ -25,7 +25,7 @@ jobs:
     runs-on: xcode-27
     needs: package-tests
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Pick an available iPhone simulator
         id: sim
         run: |
@@ -45,7 +45,7 @@ jobs:
             -enableCodeCoverage YES
       - name: Upload test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: TestResults
           path: TestResults.xcresult
