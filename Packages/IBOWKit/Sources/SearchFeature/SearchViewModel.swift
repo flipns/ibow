@@ -2,13 +2,6 @@ import Foundation
 import Observation
 import WeatherDomain
 
-/// Search screen logic.
-///
-/// Guarantees:
-/// - A new query cancels the previous task (debounce sleep or in-flight request).
-/// - A response that belongs to an older query is never shown (generation check),
-///   even if the underlying request ignores cancellation.
-/// - Cancellation is not an error.
 @Observable
 public final class SearchViewModel {
     public enum State: Equatable {
@@ -21,7 +14,6 @@ public final class SearchViewModel {
 
     public private(set) var state: State = .idle
 
-    /// Lookup used by the shell to resolve the current selection into a report.
     public func metar(for code: ICAOCode?) -> Metar? {
         guard let code, case .results(let metars) = state else { return nil }
         return metars.first { $0.station == code }
@@ -55,7 +47,6 @@ public final class SearchViewModel {
 
     public func isSelected(code: String) -> Bool { typedCodes.contains(code.uppercased()) }
 
-    /// Quick-airport chips: adds the code to the query, or removes it if already there.
     public func toggle(code: String) {
         var codes = typedCodes
         let code = code.uppercased()
@@ -63,10 +54,8 @@ public final class SearchViewModel {
         query = codes.joined(separator: ", ")
     }
 
-    /// Keyboard "search" key: no debounce.
     public func submit() { schedule(debounced: false) }
 
-    /// Pull-to-refresh: suspends until the request finishes so the spinner is accurate.
     public func refresh() async {
         schedule(debounced: false)
         await task?.value
@@ -98,7 +87,7 @@ public final class SearchViewModel {
         state = .loading
         do {
             let metars = try await search(text)
-            guard current == generation, !Task.isCancelled else { return }   // stale → drop
+            guard current == generation, !Task.isCancelled else { return }
             state = metars.isEmpty ? .empty : .results(metars)
         } catch is CancellationError {
             return

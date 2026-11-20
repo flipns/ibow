@@ -7,9 +7,7 @@ public enum DS {
         public static let primary = Palette.primary.color
         public static let onPrimary = Palette.onPrimary.color
         public static let onSurface = SwiftUI.Color.white
-        /// Opaque slate-300 instead of the spec's white @ 60 % (see `Palette.secondaryTextOnSurface`).
         public static let onSurfaceVariant = Palette.secondaryTextOnSurface.color
-        /// Same opaque colour as `onSurfaceVariant`; the spec's white @ 40 % fails AA.
         public static let onSurfaceMuted = Palette.mutedTextOnSurface.color
         public static let glass = SwiftUI.Color.white.opacity(0.10)
         public static let glassStrong = Palette.primary.color.opacity(0.20)
@@ -36,7 +34,6 @@ public enum DS {
         public static let cardPadding: CGFloat = 20
     }
 
-    /// Manrope styles. All scale with Dynamic Type via `relativeTo`.
     public enum Typography {
         public static let displayLarge = font(48, .light, relativeTo: .largeTitle)
         public static let headlineLarge = font(24, .bold, relativeTo: .title)

@@ -13,14 +13,17 @@ struct IBOWApp: App {
     init() {
         FontRegistry.registerIfNeeded()
 
-        let remote = RemoteWeatherRepository()
+        let isUITesting = ProcessInfo.processInfo.arguments.contains("-ui-testing")
+        let remote: any WeatherRepository = isUITesting ? FixtureWeatherRepository() : RemoteWeatherRepository()
         let cached = CachedWeatherRepository(base: remote)
         searchUseCase = SearchMetarsUseCase(repository: cached)
 
         let store: any FavoritesRepository
-        do {
-            store = try SwiftDataFavoritesRepository.make()
-        } catch {
+        if isUITesting {
+            store = InMemoryFavoritesRepository()
+        } else if let persistent = try? SwiftDataFavoritesRepository.make() {
+            store = persistent
+        } else {
             store = InMemoryFavoritesRepository()
         }
         favorites = FavoritesViewModel(repository: store) { codes in try await cached.metars(for: codes) }

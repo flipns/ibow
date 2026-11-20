@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Left-to-right layout that wraps to new lines; used for the token chips.
 struct FlowLayout: Layout {
     var spacing: CGFloat = 8
 

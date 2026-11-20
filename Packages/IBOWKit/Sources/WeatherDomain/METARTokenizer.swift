@@ -4,12 +4,11 @@ public enum METARTokenKind: Sendable, Hashable, CaseIterable {
 }
 
 public struct METARToken: Sendable, Hashable, Identifiable {
-    public let id: Int          // position in the report
+    public let id: Int
     public let text: String
     public let kind: METARTokenKind
 }
 
-/// Splits a raw METAR into classified tokens. Powers the interactive reader.
 public enum METARTokenizer {
     public static func tokenize(_ raw: String) -> [METARToken] {
         var inRemarks = false

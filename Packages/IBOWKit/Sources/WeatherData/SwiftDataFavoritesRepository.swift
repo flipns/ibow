@@ -2,8 +2,6 @@ import Foundation
 import SwiftData
 import WeatherDomain
 
-/// Persistence model. Internal and non-Sendable on purpose: it never leaves this actor;
-/// only `ICAOCode` values cross the boundary.
 @Model
 final class FavoriteRecord {
     @Attribute(.unique) var code: String

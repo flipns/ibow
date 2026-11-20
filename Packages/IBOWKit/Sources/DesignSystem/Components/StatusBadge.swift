@@ -14,8 +14,6 @@ public nonisolated enum StatusTone: Sendable {
     }
 }
 
-/// Colour-tinted pill that always carries a text label and (optionally) an icon,
-/// so meaning is never conveyed by colour alone.
 public struct StatusBadge: View {
     private let title: String
     private let systemImage: String?

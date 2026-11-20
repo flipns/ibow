@@ -1,6 +1,5 @@
 import SwiftUI
 
-/// Pill CTA. Dark label on the cyan→blue gradient (white would be ≈3.4:1, below AA).
 public struct PrimaryButtonStyle: ButtonStyle {
     public init() {}
 

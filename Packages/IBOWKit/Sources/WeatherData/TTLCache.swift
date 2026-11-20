@@ -1,7 +1,5 @@
 import Foundation
 
-/// In-memory cache whose entries expire `ttl` seconds after insertion.
-/// The time source is injected so expiry is deterministic in tests.
 public actor TTLCache<Key: Hashable & Sendable, Value: Sendable> {
     private struct Entry {
         let value: Value
@@ -17,7 +15,6 @@ public actor TTLCache<Key: Hashable & Sendable, Value: Sendable> {
         self.now = now
     }
 
-    /// Returns the value if present and not expired; expired entries are evicted.
     public func value(for key: Key) -> Value? {
         guard let entry = storage[key] else { return nil }
         guard entry.expiresAt > now() else {

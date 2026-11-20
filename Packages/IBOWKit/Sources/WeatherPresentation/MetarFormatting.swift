@@ -2,7 +2,6 @@ import Foundation
 import WeatherDomain
 
 extension Wind {
-    /// "270° · 10 kt · G20"
     public var shortDescription: String {
         let dir: String
         switch direction {
@@ -27,7 +26,6 @@ extension Wind {
 }
 
 extension Visibility {
-    /// "≥ 10 km" when the report only says "more than 6 SM / 9999"; otherwise the value in km.
     public var shortDescription: String {
         let km = meters / 1000
         if isLowerBound && km >= 9.5 { return "≥ 10 km" }
@@ -37,7 +35,6 @@ extension Visibility {
 }
 
 extension Wind {
-    /// For the one-line hero summary: "viento 240° a 15 kt".
     public var summaryDescription: String {
         guard speedKnots > 0 else { return "viento en calma" }
         switch direction {
@@ -48,7 +45,6 @@ extension Wind {
 }
 
 extension ICAOCode {
-    /// "L E M D" so VoiceOver spells the code instead of trying to pronounce it.
     public var spelled: String { value.map(String.init).joined(separator: " ") }
 }
 
@@ -59,7 +55,6 @@ extension Metar {
         temperatureC.map { "\(Int($0.rounded()))°" }
     }
 
-    /// One sentence per row for VoiceOver.
     public var spokenSummary: String {
         var parts = ["\(displayName), \(station.spelled)", flightCategory.spokenName]
         if let wind { parts.append(wind.spokenDescription) }

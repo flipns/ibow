@@ -1,4 +1,3 @@
-/// Parses free text such as "lemd, LEBL  lepa" into an ordered, de-duplicated list of ICAO codes.
 public enum AirportQuery {
     public static let maxCodes = 10
 

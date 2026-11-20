@@ -3,7 +3,6 @@ import Foundation
 import SwiftUI
 import WeatherDomain
 
-/// Decorative compass; the same information is available as text next to it.
 struct WindRose: View {
     let wind: Wind?
 

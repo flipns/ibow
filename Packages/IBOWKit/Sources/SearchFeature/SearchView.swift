@@ -3,9 +3,6 @@ import SwiftUI
 import WeatherDomain
 import WeatherPresentation
 
-/// Sidebar/root column of the app's `NavigationSplitView`.
-/// Uses `List(selection:)` so that selection pushes the detail on compact width
-/// (iPhone, Duo outer display) and shows it side by side on regular width (Duo inner display, iPad).
 public struct SearchView: View {
     @Bindable private var viewModel: SearchViewModel
     @Binding private var selection: ICAOCode?
@@ -44,7 +41,7 @@ public struct SearchView: View {
         #endif
     }
 
-    // MARK: Header
+    // MARK: - Header
 
     private var header: some View {
         HStack(alignment: .top) {
@@ -75,7 +72,7 @@ public struct SearchView: View {
         .padding(.top, DS.Spacing.md)
     }
 
-    // MARK: Field + chips
+    // MARK: - Field + chips
 
     private var searchField: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.sm) {
@@ -85,7 +82,7 @@ public struct SearchView: View {
             HStack(spacing: DS.Spacing.sm) {
                 Image(systemName: "magnifyingglass").accessibilityHidden(true)
                 TextField("LEMD, LEBL, LEPA", text: $viewModel.query)
-                    .frame(minHeight: 44)   // its own hit area must reach 44 pt, not just the capsule around it
+                    .frame(minHeight: 44) it
                     #if os(iOS)
                     .textInputAutocapitalization(.characters)
                     #endif
@@ -100,7 +97,7 @@ public struct SearchView: View {
                             .frame(width: 44, height: 44)
                             .contentShape(Rectangle())
                     }
-                    .buttonStyle(.plain)   // inside a List row the default style shrinks the hit area to the glyph
+                    .buttonStyle(.plain)
                     .accessibilityLabel("Borrar búsqueda")
                 }
             }
@@ -146,7 +143,7 @@ public struct SearchView: View {
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    // MARK: States
+    // MARK: - States
 
     @ViewBuilder private var stateMessage: some View {
         switch viewModel.state {
@@ -189,7 +186,6 @@ public struct SearchView: View {
 }
 
 private extension View {
-    /// Non-selectable, transparent list row for header/field/chips.
     func plainRow(horizontalInset: CGFloat = DS.Spacing.md) -> some View {
         self
             .listRowBackground(Color.clear)

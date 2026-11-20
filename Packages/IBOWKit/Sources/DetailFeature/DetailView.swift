@@ -3,7 +3,6 @@ import SwiftUI
 import WeatherDomain
 import WeatherPresentation
 
-/// Presentational view: receives a report, owns only the "which token is selected" UI state.
 public struct DetailView: View {
     private let metar: Metar
     @State private var pickedID: Int
@@ -14,15 +13,12 @@ public struct DetailView: View {
     private let isFavorite: Bool
     private let onToggleFavorite: (() -> Void)?
 
-    /// `onToggleFavorite == nil` hides the star (the screen stays usable without a favorites store).
     public init(metar: Metar, isFavorite: Bool = false, onToggleFavorite: (() -> Void)? = nil) {
         self.metar = metar
         self.isFavorite = isFavorite
         self.onToggleFavorite = onToggleFavorite
-        // The leading "METAR" label adds nothing for the reader, so it is not offered as a chip.
         let tokens = METARTokenizer.tokenize(metar.rawText).filter { $0.text != "METAR" }
         self.tokens = tokens
-        // One-time seed: start on the wind group, the most informative one.
         _pickedID = State(initialValue: tokens.first { $0.kind == .wind }?.id ?? 0)
     }
 
@@ -38,11 +34,11 @@ public struct DetailView: View {
             .padding(DS.Spacing.md)
         }
         .background { AtmosphericBackground() }
+        .accessibilityIdentifier("detail-screen")
         .navigationTitle(metar.station.value)
         .navigationSubtitle(metar.displayName)
         .toolbar {
             if let onToggleFavorite {
-                // Primary action of the screen: the system keeps it at the top of the vertical axis on iPhone Duo.
                 ToolbarItem(placement: .primaryAction) {
                     Button(action: onToggleFavorite) {
                         Label(isFavorite ? "Quitar de favoritos" : "Añadir a favoritos",
@@ -58,8 +54,8 @@ public struct DetailView: View {
         #endif
     }
 
-    // MARK: Hero
-
+    // MARK: - Hero
+    
     private var condition: WeatherCondition { WeatherCondition(metar) }
 
     private var heroSummary: String {
@@ -89,7 +85,6 @@ public struct DetailView: View {
                         .foregroundStyle(Palette.illusCyan.color)
                         .accessibilityLabel(Text(verbatim: condition.spokenName))
                 }
-                // Re-evaluated every minute so "hace N min" doesn't go stale while the screen stays open.
                 TimelineView(.everyMinute) { context in
                     Text(observationLine(now: context.date))
                         .font(DS.Typography.caption).foregroundStyle(DS.Color.onSurfaceVariant)
@@ -109,7 +104,7 @@ public struct DetailView: View {
         .accessibilityElement(children: .combine)
     }
 
-    // MARK: Interactive reader
+    // MARK: - Interactive reader
 
     private var reader: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.sm) {
@@ -140,10 +135,8 @@ public struct DetailView: View {
         }
     }
 
-    // MARK: Tiles
+    // MARK: - Tiles
 
-    /// Fixed layout from the design: wind full width, then three rows of two half-width tiles.
-    /// At accessibility text sizes the halves stack so nothing truncates.
     @ViewBuilder private var tiles: some View {
         VStack(spacing: DS.Spacing.md) {
             if let wind = metar.wind { windTile(wind) }
@@ -307,7 +300,6 @@ extension Tile where Accessory == EmptyView {
     }
 }
 
-/// Horizontal meter, 0…1.
 private struct MeterBar: View {
     let fraction: Double
     let color: RGB
@@ -324,7 +316,6 @@ private struct MeterBar: View {
     }
 }
 
-/// One bar per cloud layer; length = how much of the sky it covers.
 private struct CloudBars: View {
     let layers: [CloudLayer]
 

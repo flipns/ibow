@@ -1,7 +1,5 @@
 import SwiftUI
 
-/// Dark base with three blurred colour blobs, positioned and tinted as in the design
-/// (cyan top-right, indigo mid-left, blue bottom-right). Static: no animation, no battery cost.
 public struct AtmosphericBackground: View {
     public init() {}
 

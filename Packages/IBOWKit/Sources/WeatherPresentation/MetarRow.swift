@@ -2,8 +2,6 @@ import DesignSystem
 import SwiftUI
 import WeatherDomain
 
-/// Row content only. Tapping/selection is owned by the enclosing `List(selection:)`,
-/// which also gives push navigation when `NavigationSplitView` collapses to compact width.
 public struct MetarRow: View {
     let metar: Metar
     let isSelected: Bool
@@ -14,10 +12,6 @@ public struct MetarRow: View {
         self.isSelected = isSelected
     }
 
-    /// Selection is only meaningful while the detail is visible beside the list (regular width).
-    /// On compact width the list is replaced by the detail, and the selection lingers for a moment after
-    /// popping back: highlighting it caused a blue→grey flash. `.outlined` shares the standard padding,
-    /// so the content never shifts when the highlight appears or goes away.
     private var isHighlighted: Bool { isSelected && sizeClass == .regular }
 
     public var body: some View {
@@ -44,6 +38,7 @@ public struct MetarRow: View {
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(metar.spokenSummary)
         .accessibilityHint("Abre el METAR completo")
+        .accessibilityIdentifier("metar-row-\(metar.station.value)")
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 

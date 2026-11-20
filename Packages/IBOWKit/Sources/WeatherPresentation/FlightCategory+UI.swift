@@ -12,7 +12,6 @@ extension FlightCategory {
         }
     }
 
-    /// Read aloud by VoiceOver instead of letter-by-letter acronyms.
     public var spokenName: String {
         switch self {
         case .vfr: "condiciones de vuelo visual"

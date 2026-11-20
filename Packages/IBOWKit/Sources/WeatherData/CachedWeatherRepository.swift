@@ -1,8 +1,6 @@
 import Foundation
 import WeatherDomain
 
-/// Decorator: serves a still-valid result for the same query from memory,
-/// otherwise delegates and stores the fresh result (replacing an expired one).
 public struct CachedWeatherRepository: WeatherRepository {
     public static let defaultTTL: TimeInterval = 3 * 60
 
@@ -22,7 +20,7 @@ public struct CachedWeatherRepository: WeatherRepository {
         let key = codes.map(\.value).sorted().joined(separator: ",")
         if let hit = await cache.value(for: key) { return hit }
 
-        let fresh = try await base.metars(for: codes)   // cancelled/failed → nothing cached
+        let fresh = try await base.metars(for: codes)
         await cache.insert(fresh, for: key)
         return fresh
     }

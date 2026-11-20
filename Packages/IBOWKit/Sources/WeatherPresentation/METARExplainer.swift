@@ -4,11 +4,9 @@ import WeatherDomain
 public nonisolated struct TokenExplanation: Sendable, Equatable {
     public let title: String
     public let detail: String
-    /// What VoiceOver reads for the explanation card.
     public var spoken: String { "\(title). \(detail)" }
 }
 
-/// Plain-language (Spanish) explanation of each METAR group. Pure functions → easy to test.
 public nonisolated enum METARExplainer {
     public static func explain(_ token: METARToken) -> TokenExplanation {
         let t = token.text

@@ -1,6 +1,5 @@
 import Foundation
 
-/// A validated ICAO airport identifier (4 alphanumeric characters, uppercased).
 public struct ICAOCode: Sendable, Hashable, Comparable, CustomStringConvertible {
     public let value: String
 

@@ -3,7 +3,6 @@ import SwiftUI
 import WeatherDomain
 import WeatherPresentation
 
-/// Sidebar/root column of the Favorites tab (same selection pattern as the search screen).
 public struct FavoritesView: View {
     private let viewModel: FavoritesViewModel
     @Binding private var selection: ICAOCode?
@@ -23,7 +22,7 @@ public struct FavoritesView: View {
         .background { AtmosphericBackground() }
         .refreshable { await viewModel.refreshMetars() }
         #if os(iOS)
-        .toolbar(.hidden, for: .navigationBar)   // same custom header as the search screen
+        .toolbar(.hidden, for: .navigationBar)
         #endif
         .task { await viewModel.load() }
     }

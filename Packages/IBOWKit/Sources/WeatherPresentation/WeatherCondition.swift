@@ -1,7 +1,6 @@
 import Foundation
 import WeatherDomain
 
-/// What the sky looks like, derived from the report (present-weather groups first, then cloud cover).
 public nonisolated enum WeatherCondition: Sendable, Equatable {
     case clear, fewClouds, scattered, broken, overcast
     case fog, drizzle, rain, showers, thunderstorm, snow, hail
@@ -27,7 +26,6 @@ public nonisolated enum WeatherCondition: Sendable, Equatable {
         }
     }
 
-    /// Two-letter codes from every present-weather group ("-SHRA" → SH, RA).
     static func phenomena(in metar: Metar) -> Set<String> {
         var result = Set<String>()
         let tokens = METARTokenizer.tokenize(metar.rawText).filter { $0.kind == .presentWeather }.map(\.text)
@@ -75,7 +73,6 @@ public nonisolated enum WeatherCondition: Sendable, Equatable {
     }
 }
 
-/// Approximate day/night from sun elevation (ignores the equation of time, good to ~15 min).
 public nonisolated enum Daylight {
     public static func isDaylight(at date: Date, latitude: Double?, longitude: Double?) -> Bool {
         guard let latitude, let longitude else { return true }

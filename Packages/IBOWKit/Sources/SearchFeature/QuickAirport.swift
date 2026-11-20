@@ -1,4 +1,3 @@
-/// Suggestions shown as chips under the search field.
 struct QuickAirport: Identifiable {
     let code: String
     let city: String
@@ -10,6 +9,6 @@ struct QuickAirport: Identifiable {
         .init(code: "KJFK", city: "New York"),
         .init(code: "LFPG", city: "París"),
         .init(code: "EGLL", city: "Londres"),
-        .init(code: "NTAA", city: "Teahupo'o"),   // Faa'a (Tahití): closest airport that publishes METAR
+        .init(code: "NTAA", city: "Teahupo'o")
     ]
 }

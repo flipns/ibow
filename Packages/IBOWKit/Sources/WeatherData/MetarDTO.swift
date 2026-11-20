@@ -1,9 +1,6 @@
 import Foundation
 import WeatherDomain
 
-/// Tolerant decoding: the API mixes numbers, strings and nulls for several fields
-/// (`wdir` can be "VRB", `visib` can be "10+"). Anything unreadable becomes nil
-/// instead of failing the whole response.
 struct MetarDTO: Decodable, Sendable {
     struct CloudDTO: Decodable, Sendable {
         let cover: String?
@@ -80,7 +77,6 @@ struct MetarDTO: Decodable, Sendable {
         }
     }
 
-    /// Returns nil when the record is unusable (bad station code).
     func toDomain() -> Metar? {
         guard let station = ICAOCode(icaoId) else { return nil }
 
@@ -125,7 +121,6 @@ struct MetarDTO: Decodable, Sendable {
 }
 
 extension KeyedDecodingContainer {
-    /// Reads a number whether it is encoded as a number or as a numeric string.
     func lossyDouble(_ key: Key) -> Double? {
         if let value = try? decodeIfPresent(Double.self, forKey: key) { return value }
         if let text = try? decodeIfPresent(String.self, forKey: key) { return Double(text) }

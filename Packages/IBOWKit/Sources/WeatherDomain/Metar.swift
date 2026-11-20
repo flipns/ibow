@@ -26,7 +26,6 @@ public struct Wind: Sendable, Hashable {
 
 public struct Visibility: Sendable, Hashable {
     public let statuteMiles: Double
-    /// `true` when the report says "10+" (more than the value).
     public let isLowerBound: Bool
 
     public init(statuteMiles: Double, isLowerBound: Bool = false) {
@@ -51,9 +50,7 @@ public struct CloudLayer: Sendable, Hashable {
 }
 
 public struct Metar: Sendable, Hashable, Identifiable {
-    /// Stable identity: one entry per station, survives refreshes (selection keeps working).
     public var id: ICAOCode { station }
-
     public let station: ICAOCode
     public let name: String?
     public let observedAt: Date

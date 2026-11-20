@@ -1,8 +1,6 @@
 import Foundation
 
-/// "hace 12 min" for the hero card. Pure function with injected `now`, so it is trivially testable.
 public nonisolated enum ObservationAge {
-    /// `nil` when the observation time is unknown (the DTO uses `.distantPast` for a missing `obsTime`).
     public static func text(from observedAt: Date, now: Date) -> String? {
         let seconds = now.timeIntervalSince(observedAt)
         guard seconds < 60 * 60 * 24 * 365 else { return nil }

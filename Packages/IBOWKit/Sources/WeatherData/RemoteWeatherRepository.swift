@@ -1,7 +1,6 @@
 import Foundation
 import WeatherDomain
 
-/// Adapter for https://aviationweather.gov/api/data/metar (no API key).
 public struct RemoteWeatherRepository: WeatherRepository {
     private let transport: any HTTPTransport
     private let baseURL: URL
