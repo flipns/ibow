@@ -87,7 +87,7 @@ public struct DetailView: View {
         VStack(alignment: .leading, spacing: DS.Spacing.sm) {
             Text("Lee el METAR").font(DS.Typography.headlineSmall).foregroundStyle(DS.Color.onSurface)
             Text("Toca un grupo para ver qué significa.")
-                .font(DS.Typography.bodySmall).foregroundStyle(DS.Color.onSurfaceVariant)
+                .font(DS.Typography.bodySmall).foregroundStyle(DS.Color.accentSoft)
 
             GlassCard {
                 FlowLayout(spacing: DS.Spacing.sm) {

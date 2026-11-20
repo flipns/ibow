@@ -7,9 +7,10 @@ public enum DS {
         public static let primary = Palette.primary.color
         public static let onPrimary = Palette.onPrimary.color
         public static let onSurface = SwiftUI.Color.white
-        public static let onSurfaceVariant = SwiftUI.Color.white.opacity(0.60)
-        /// Raised from the spec's 40 % to keep ≥ 4.5:1 (see `Palette.mutedTextOnSurface`).
-        public static let onSurfaceMuted = SwiftUI.Color.white.opacity(0.70)
+        /// Opaque slate-300 instead of the spec's white @ 60 % (see `Palette.secondaryTextOnSurface`).
+        public static let onSurfaceVariant = Palette.secondaryTextOnSurface.color
+        /// Same opaque colour as `onSurfaceVariant`; the spec's white @ 40 % fails AA.
+        public static let onSurfaceMuted = Palette.mutedTextOnSurface.color
         public static let glass = SwiftUI.Color.white.opacity(0.10)
         public static let glassStrong = Palette.primary.color.opacity(0.20)
         public static let borderGlass = SwiftUI.Color.white.opacity(0.20)

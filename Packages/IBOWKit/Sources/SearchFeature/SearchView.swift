@@ -54,7 +54,7 @@ public struct SearchView: View {
                     .accessibilityAddTraits(.isHeader)
                 Text("Tiempo operativo · METAR")
                     .font(DS.Typography.bodyMedium)
-                    .foregroundStyle(DS.Color.onSurfaceVariant)
+                    .foregroundStyle(DS.Color.accentSoft)
             }
             Spacer(minLength: DS.Spacing.sm)
             Button {
@@ -80,10 +80,11 @@ public struct SearchView: View {
         VStack(alignment: .leading, spacing: DS.Spacing.sm) {
             Text("Códigos OACI, separados por comas")
                 .font(DS.Typography.bodySmall)
-                .foregroundStyle(DS.Color.onSurfaceVariant)
+                .foregroundStyle(DS.Color.accentSoft)
             HStack(spacing: DS.Spacing.sm) {
                 Image(systemName: "magnifyingglass").accessibilityHidden(true)
                 TextField("LEMD, LEBL, LEPA", text: $viewModel.query)
+                    .frame(minHeight: 44)   // its own hit area must reach 44 pt, not just the capsule around it
                     #if os(iOS)
                     .textInputAutocapitalization(.characters)
                     #endif
@@ -94,8 +95,11 @@ public struct SearchView: View {
                     .accessibilityHint("Separa varios códigos con comas")
                 if !viewModel.query.isEmpty {
                     Button { viewModel.query = "" } label: {
-                        Image(systemName: "xmark.circle.fill").frame(minWidth: 44, minHeight: 44)
+                        Image(systemName: "xmark.circle.fill")
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
                     }
+                    .buttonStyle(.plain)   // inside a List row the default style shrinks the hit area to the glyph
                     .accessibilityLabel("Borrar búsqueda")
                 }
             }
@@ -137,7 +141,7 @@ public struct SearchView: View {
     private func summary(_ metars: [Metar]) -> some View {
         Text(metars.count == 1 ? "1 aeropuerto" : "\(metars.count) aeropuertos")
             .font(DS.Typography.bodySmall)
-            .foregroundStyle(DS.Color.onSurfaceMuted)
+            .foregroundStyle(DS.Color.accentSoft)
             .frame(maxWidth: .infinity, alignment: .leading)
     }
 
@@ -165,7 +169,7 @@ public struct SearchView: View {
             Image(systemName: icon).font(.largeTitle).foregroundStyle(DS.Color.accentSoft)
                 .accessibilityHidden(true)
             Text(title).font(DS.Typography.headlineSmall).foregroundStyle(DS.Color.onSurface)
-            Text(detail).font(DS.Typography.bodyMedium).foregroundStyle(DS.Color.onSurfaceVariant)
+            Text(detail).font(DS.Typography.bodyMedium).foregroundStyle(DS.Color.accentSoft)
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)

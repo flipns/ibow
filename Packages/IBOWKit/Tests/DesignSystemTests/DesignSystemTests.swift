@@ -30,4 +30,12 @@ struct DesignSystemTests {
     func badgeTextReadableOnSurface(tone: StatusTone) {
         #expect(RGB.contrast(tone.rgb, Palette.surface) >= 4.5)
     }
+
+    @Test func secondaryAndMutedTextMeetAAOnTheLightestBackdrops() {
+        for backdrop in [Palette.lightestCardBackdrop, Palette.lightestAccentBackdrop] {
+            #expect(RGB.contrast(Palette.secondaryTextOnSurface, backdrop) >= 4.5)
+            #expect(RGB.contrast(Palette.mutedTextOnSurface, backdrop) >= 4.5)
+            #expect(RGB.contrast(Palette.accentSoft, backdrop) >= 4.5)
+        }
+    }
 }

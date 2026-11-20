@@ -52,8 +52,15 @@ public nonisolated enum Palette {
     public static let illusGreen = RGB(hex: 0x4ADE80)
     public static let illusViolet = RGB(hex: 0xC084FC)
 
-    /// Secondary text (white @ 60 %) over the base surface.
-    public static let secondaryTextOnSurface = white.over(surface, alpha: 0.60)
-    /// Design spec uses white @ 40 % for muted text, which fails AA (≈3.7:1); we use 70 %.
-    public static let mutedTextOnSurface = white.over(surface, alpha: 0.70)
+    /// Secondary text: opaque slate-300. Opaque on purpose: the accessibility audit cannot measure
+    /// contrast for semi-transparent text over blurred gradients and flags it even at 82 % white.
+    public static let secondaryTextOnSurface = RGB(hex: 0xCBD5E1)
+    /// Muted text uses the same opaque colour (hierarchy comes from size/weight): anything darker
+    /// drops below 4.5:1 over the tinted glass cards. The spec's white @ 40 % is ≈3.7:1.
+    public static let mutedTextOnSurface = RGB(hex: 0xCBD5E1)
+
+    /// Lightest realistic backdrop for text: cyan blob under a white-14 % glass card.
+    public static let lightestCardBackdrop = white.over(atmosCyan.over(surface, alpha: 0.30), alpha: 0.14)
+    /// Same blob under the accent card (cyan 22 % gradient start).
+    public static let lightestAccentBackdrop = atmosCyan.over(atmosCyan.over(surface, alpha: 0.30), alpha: 0.22)
 }
