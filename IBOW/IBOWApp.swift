@@ -13,14 +13,16 @@ struct IBOWApp: App {
     init() {
         FontRegistry.registerIfNeeded()
 
-        // Composition root: the only place that knows concrete types of every layer.
         let remote = RemoteWeatherRepository()
-        let cached = CachedWeatherRepository(base: remote)      // 3-minute in-memory TTL
+        let cached = CachedWeatherRepository(base: remote)
         searchUseCase = SearchMetarsUseCase(repository: cached)
 
-        // Favorites persist in SwiftData; if the store can't open, fall back to memory instead of crashing.
-        let store = (try? SwiftDataFavoritesRepository.make())
-            ?? (try! SwiftDataFavoritesRepository.make(inMemory: true))
+        let store: any FavoritesRepository
+        do {
+            store = try SwiftDataFavoritesRepository.make()
+        } catch {
+            store = InMemoryFavoritesRepository()
+        }
         favorites = FavoritesViewModel(repository: store) { codes in try await cached.metars(for: codes) }
     }
 
