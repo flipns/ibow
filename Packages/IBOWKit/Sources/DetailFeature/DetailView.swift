@@ -34,6 +34,7 @@ public struct DetailView: View {
         }
         .background { AtmosphericBackground() }
         .navigationTitle(metar.station.value)
+        .navigationSubtitle(metar.displayName)
         #if os(iOS)
         .navigationBarTitleDisplayMode(.inline)
         #endif
@@ -41,22 +42,39 @@ public struct DetailView: View {
 
     // MARK: Hero
 
+    private var condition: WeatherCondition { WeatherCondition(metar) }
+
+    private var heroSummary: String {
+        var parts: [String] = []
+        if let visibility = metar.visibility { parts.append("Visibilidad \(visibility.shortDescription)") }
+        if let wind = metar.wind { parts.append(wind.summaryDescription) }
+        return parts.joined(separator: " · ")
+    }
+
     private var hero: some View {
-        GlassCard(.accent) {
+        let isDaylight = Daylight.isDaylight(at: metar.observedAt, latitude: metar.latitude, longitude: metar.longitude)
+        return GlassCard(.accent) {
             VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-                HStack(alignment: .firstTextBaseline) {
-                    Text(metar.station.value).font(DS.Typography.headlineLarge)
-                    Spacer()
+                HStack(alignment: .top) {
                     FlightCategoryBadge(metar.flightCategory)
-                }
-                Text(metar.displayName)
-                    .font(DS.Typography.bodyMedium).foregroundStyle(DS.Color.onSurfaceVariant)
-                if let temp = metar.temperatureText {
-                    Text(temp).font(DS.Typography.displayLarge)
-                        .accessibilityLabel("Temperatura \(temp.dropLast()) grados")
+                    Spacer()
+                    Image(systemName: condition.symbolName(isDaylight: isDaylight))
+                        .symbolRenderingMode(.hierarchical)
+                        .font(.system(size: 40))
+                        .foregroundStyle(Palette.illusCyan.color)
+                        .accessibilityLabel(Text(verbatim: condition.spokenName))
                 }
                 Text("Observado a las \(metar.observedAt, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: .gmt)) UTC")
-                    .font(DS.Typography.caption).foregroundStyle(DS.Color.onSurfaceMuted)
+                    .font(DS.Typography.caption).foregroundStyle(DS.Color.onSurfaceVariant)
+                if let temp = metar.temperatureText {
+                    Text(temp).font(DS.Typography.displayLarge)
+                        .padding(.top, DS.Spacing.sm)
+                        .accessibilityLabel("Temperatura \(temp.dropLast()) grados")
+                }
+                if !heroSummary.isEmpty {
+                    Text(heroSummary).font(DS.Typography.bodyMedium)
+                        .foregroundStyle(DS.Color.accentSoft)
+                }
             }
             .foregroundStyle(DS.Color.onSurface)
         }
@@ -139,7 +157,7 @@ public struct DetailView: View {
     private var visibilityTile: some View {
         let vis = metar.visibility
         let km = (vis?.meters ?? 0) / 1000
-        let value = vis.map { String(format: "%@%.1f km", $0.isLowerBound ? "≥ " : "", km) } ?? "—"
+        let value = vis?.shortDescription ?? "—"
         return Tile(title: "Visibilidad", icon: "eye", tint: Palette.illusGreen, value: value,
                     caption: km >= 9.5 ? "Sin restricción" : nil,
                     accessory: { MeterBar(fraction: km / 10, color: Palette.illusGreen) },
