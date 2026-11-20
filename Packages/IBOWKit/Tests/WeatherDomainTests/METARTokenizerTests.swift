@@ -28,4 +28,14 @@ struct METARTokenizerTests {
         #expect(tokens.map(\.text) == ["LEMD", "191830Z"])
         #expect(tokens.map(\.id) == [0, 1])
     }
+
+    @Test func realReportWithMETARPrefixAndCAVOK() {
+        let tokens = METARTokenizer.tokenize("METAR LEBL 201030Z 32007KT CAVOK 15/07 Q1020 NOSIG")
+        #expect(tokens.map(\.kind) == [.modifier, .station, .observationTime, .wind, .visibility, .temperature, .pressure, .trend])
+    }
+
+    @Test func realReportWithWindVariation() {
+        let tokens = METARTokenizer.tokenize("METAR LEMD 201030Z 17003KT 130V210 9999 FEW013 11/08 Q1024 NOSIG")
+        #expect(tokens.map(\.kind) == [.modifier, .station, .observationTime, .wind, .windVariation, .visibility, .clouds, .temperature, .pressure, .trend])
+    }
 }

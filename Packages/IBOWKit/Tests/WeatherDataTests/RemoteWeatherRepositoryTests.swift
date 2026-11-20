@@ -96,3 +96,28 @@ final class LockedBox<T: Sendable>: Sendable {
     func set(_ v: T) { box.withLock { $0 = v } }
     func get() -> T { box.withLock { $0 } }
 }
+
+/// Verbatim response captured from aviationweather.gov on 2026-11-20.
+private let realSample = """
+[{"icaoId":"LEBL","receiptTime":"2026-11-20T10:34:24.299Z","obsTime":1795170600,"reportTime":"2026-11-20T10:30:00.000Z","temp":15,"dewp":7,"wdir":320,"wspd":7,"visib":"6+","altim":1020,"qcField":16,"metarType":"METAR","rawOb":"METAR LEBL 201030Z 32007KT CAVOK 15/07 Q1020 NOSIG","lat":41.293,"lon":2.07,"elev":2,"name":"Barcelona/Prat Arpt, CT, ES","cover":"CAVOK","clouds":[],"fltCat":"VFR"},{"icaoId":"LEMD","receiptTime":"2026-11-20T10:34:24.367Z","obsTime":1795170600,"reportTime":"2026-11-20T10:30:00.000Z","temp":11,"dewp":8,"wdir":170,"wspd":3,"visib":"6+","altim":1024,"qcField":16,"metarType":"METAR","rawOb":"METAR LEMD 201030Z 17003KT 130V210 9999 FEW013 11/08 Q1024 NOSIG","lat":40.466,"lon":-3.555,"elev":589,"name":"Madrid/Barajas Arpt, M, ES","cover":"FEW","clouds":[{"cover":"FEW","base":1300}],"fltCat":"VFR"}]
+"""
+
+@Suite("RemoteWeatherRepository · real payload")
+struct RealPayloadTests {
+    @Test func decodesCapturedResponse() async throws {
+        let sut = RemoteWeatherRepository(transport: StubTransport { _ in (Data(realSample.utf8), 200) })
+
+        let result = try await sut.metars(for: [ICAOCode("LEBL")!, ICAOCode("LEMD")!])
+
+        let madrid = try #require(result.first { $0.station.value == "LEMD" })
+        #expect(madrid.wind == Wind(direction: .degrees(170), speedKnots: 3, gustKnots: nil))
+        #expect(madrid.clouds == [CloudLayer(cover: .few, baseFeet: 1300)])
+        #expect(madrid.altimeterHPa == 1024)
+        #expect(madrid.observedAt == Date(timeIntervalSince1970: 1795170600))
+        #expect(madrid.name == "Madrid/Barajas Arpt, M, ES")
+
+        let barcelona = try #require(result.first { $0.station.value == "LEBL" })
+        #expect(barcelona.clouds.isEmpty)
+        #expect(barcelona.visibility == Visibility(statuteMiles: 6, isLowerBound: true))
+    }
+}
