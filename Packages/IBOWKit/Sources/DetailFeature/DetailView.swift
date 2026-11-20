@@ -69,6 +69,13 @@ public struct DetailView: View {
         return parts.joined(separator: " · ")
     }
 
+    private func observationLine(now: Date) -> String {
+        let time = metar.observedAt.formatted(Date.FormatStyle(date: .omitted, time: .shortened, timeZone: .gmt))
+        let base = "Observado a las \(time) UTC"
+        guard let age = ObservationAge.text(from: metar.observedAt, now: now) else { return base }
+        return "\(base) · \(age)"
+    }
+
     private var hero: some View {
         let isDaylight = Daylight.isDaylight(at: metar.observedAt, latitude: metar.latitude, longitude: metar.longitude)
         return GlassCard(.accent) {
@@ -82,8 +89,11 @@ public struct DetailView: View {
                         .foregroundStyle(Palette.illusCyan.color)
                         .accessibilityLabel(Text(verbatim: condition.spokenName))
                 }
-                Text("Observado a las \(metar.observedAt, format: Date.FormatStyle(date: .omitted, time: .shortened, timeZone: .gmt)) UTC")
-                    .font(DS.Typography.caption).foregroundStyle(DS.Color.onSurfaceVariant)
+                // Re-evaluated every minute so "hace N min" doesn't go stale while the screen stays open.
+                TimelineView(.everyMinute) { context in
+                    Text(observationLine(now: context.date))
+                        .font(DS.Typography.caption).foregroundStyle(DS.Color.onSurfaceVariant)
+                }
                 if let temp = metar.temperatureText {
                     Text(temp).font(DS.Typography.displayLarge)
                         .padding(.top, DS.Spacing.sm)
