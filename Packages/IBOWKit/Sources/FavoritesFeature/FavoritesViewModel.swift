@@ -18,6 +18,9 @@ public final class FavoritesViewModel {
     public private(set) var codes: [ICAOCode] = []
     public private(set) var state: State = .loading
     private var metars: [ICAOCode: Metar] = [:]
+    /// Tail of the persistence queue. Writes are chained so they reach the store in tap order:
+    /// two unstructured `Task`s calling the repository directly could be reordered.
+    private var lastWrite: Task<Void, Never>?
 
     public typealias Fetch = @Sendable ([ICAOCode]) async throws -> [Metar]
 
@@ -38,8 +41,11 @@ public final class FavoritesViewModel {
 
     /// Loads persisted favorites, then their latest reports (served by the repository's TTL cache when fresh).
     public func load() async {
+        await lastWrite?.value   // don't read the store while a toggle is still being written
         do {
             codes = try await repository.favorites()
+        } catch is CancellationError {
+            return
         } catch {
             state = .failed(.decoding)
             return
@@ -66,13 +72,22 @@ public final class FavoritesViewModel {
     /// Remembers a report seen elsewhere (search results) so a new favorite shows instantly.
     public func remember(_ metar: Metar) { metars[metar.station] = metar }
 
+    /// Optimistic: the UI flips immediately, then the write is queued behind any earlier write.
+    /// The write is unstructured on purpose: it must finish even if the caller (a button's `Task`) is cancelled.
     public func toggle(_ code: ICAOCode) async {
         let wasFavorite = isFavorite(code)
         codes = wasFavorite ? codes.filter { $0 != code } : [code] + codes
-        do {
-            try await repository.setFavorite(code, isFavorite: !wasFavorite)
-        } catch {
-            codes = wasFavorite ? [code] + codes : codes.filter { $0 != code }   // roll back
+
+        let previous = lastWrite
+        let write = Task {   // starts on the main actor: the rollback below mutates UI state
+            await previous?.value
+            do {
+                try await repository.setFavorite(code, isFavorite: !wasFavorite)
+            } catch {
+                codes = wasFavorite ? [code] + codes.filter { $0 != code } : codes.filter { $0 != code }   // roll back
+            }
         }
+        lastWrite = write
+        await write.value
     }
 }

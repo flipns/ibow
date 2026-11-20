@@ -89,4 +89,15 @@ struct FavoritesViewModelTests {
         await sut.load()
         #expect(sut.state == .failed(.network))
     }
+
+    @Test func rapidTogglesReachTheStoreInOrder() async {
+        let repo = FakeFavorites()
+        let sut = makeSUT(repo)
+        // Fire without awaiting between taps, like a user double-tapping the star.
+        async let first: Void = sut.toggle(lemd)
+        async let second: Void = sut.toggle(lemd)
+        _ = await (first, second)
+        #expect(!sut.isFavorite(lemd))                 // on, then off
+        #expect(try await repo.favorites().isEmpty)    // the store agrees with the UI
+    }
 }
