@@ -5,7 +5,6 @@ import SearchFeature
 import SwiftUI
 import WeatherDomain
 
-/// App shell: Search and Favorites tabs, each hosting a list/detail split view.
 struct ContentView: View {
     @State private var viewModel: SearchViewModel
     @State private var favorites: FavoritesViewModel
