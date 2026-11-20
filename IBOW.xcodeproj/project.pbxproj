@@ -6,6 +6,11 @@
 	objectVersion = 110;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		1D98A0DA30B043C900E2C419 /* WeatherData in Frameworks */ = {isa = PBXBuildFile; productRef = 1D98A0D930B043C900E2C419 /* WeatherData */; };
+		1D98A0DC30B043C900E2C419 /* WeatherDomain in Frameworks */ = {isa = PBXBuildFile; productRef = 1D98A0DB30B043C900E2C419 /* WeatherDomain */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		1D98A0BE30AF6A5E00E2C419 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -51,6 +56,8 @@
 		1D98A0AD30AF6A5D00E2C419 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			files = (
+				1D98A0DA30B043C900E2C419 /* WeatherData in Frameworks */,
+				1D98A0DC30B043C900E2C419 /* WeatherDomain in Frameworks */,
 			);
 		};
 		1D98A0BA30AF6A5E00E2C419 /* Frameworks */ = {
@@ -103,6 +110,10 @@
 				1D98A0B230AF6A5D00E2C419 /* IBOW */,
 			);
 			name = IBOW;
+			packageProductDependencies = (
+				1D98A0D930B043C900E2C419 /* WeatherData */,
+				1D98A0DB30B043C900E2C419 /* WeatherDomain */,
+			);
 			productName = IBOW;
 			productReference = 1D98A0B030AF6A5D00E2C419 /* IBOW.app */;
 			productType = "com.apple.product-type.application";
@@ -181,6 +192,9 @@
 			);
 			mainGroup = 1D98A0A730AF6A5D00E2C419;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				1D98A0D830B043C900E2C419 /* XCLocalSwiftPackageReference "Packages/IBOWKit" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 1D98A0B130AF6A5D00E2C419 /* Products */;
 			projectDirPath = "";
@@ -304,6 +318,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
@@ -360,6 +375,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_VERSION = 6.0;
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -379,6 +395,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -391,7 +408,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -411,6 +428,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.6;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -423,7 +441,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
@@ -436,7 +454,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 93XLHV84FJ;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.altbensolutions.IBOWTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -444,7 +462,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IBOW.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IBOW";
 			};
@@ -458,7 +476,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 93XLHV84FJ;
 				GENERATE_INFOPLIST_FILE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 27.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.altbensolutions.IBOWTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -466,7 +484,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/IBOW.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/IBOW";
 			};
@@ -479,6 +497,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 93XLHV84FJ;
 				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.altbensolutions.IBOWUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -486,7 +505,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = IBOW;
 			};
@@ -499,6 +518,7 @@
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 93XLHV84FJ;
 				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.6;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.altbensolutions.IBOWUITests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -506,7 +526,7 @@
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_EMIT_LOC_STRINGS = NO;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_TARGET_NAME = IBOW;
 			};
@@ -548,6 +568,24 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		1D98A0D830B043C900E2C419 /* XCLocalSwiftPackageReference "Packages/IBOWKit" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Packages/IBOWKit;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		1D98A0D930B043C900E2C419 /* WeatherData */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WeatherData;
+		};
+		1D98A0DB30B043C900E2C419 /* WeatherDomain */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = WeatherDomain;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 1D98A0A830AF6A5D00E2C419 /* Project object */;
 	validationLevel = 1;

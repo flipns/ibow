@@ -1,0 +1,17 @@
+# Xcode
+xcuserdata/
+*.xcuserstate
+DerivedData/
+build/
+.build/
+*.xcresult
+# macOS
+.DS_Store
+# SwiftPM
+.swiftpm/
+Package.resolved
+# Secrets / signing (never commit)
+*.p12
+*.mobileprovision
+*.p8
+.env
