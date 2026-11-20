@@ -24,6 +24,7 @@ jobs:
     name: App build + tests
     runs-on: xcode-27
     needs: package-tests
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@v5
       - name: Pick an available iPhone simulator
@@ -34,15 +35,41 @@ jobs:
           echo "Using simulator: $NAME"
       - name: Use the on-screen keyboard (UI tests type into the search field)
         run: defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool false
-      - name: xcodebuild test
+      - name: Boot the simulator and wait until it is ready
+        run: |
+          UDID=$(xcrun simctl list devices available | grep -m1 "${{ steps.sim.outputs.name }} (" | grep -oE '[0-9A-F-]{36}')
+          echo "UDID=$UDID" >> "$GITHUB_ENV"
+          xcrun simctl shutdown all || true
+          xcrun simctl boot "$UDID"
+          xcrun simctl bootstatus "$UDID" -b
+      - name: Build for testing
         run: |
           set -o pipefail
-          xcodebuild test \
+          xcodebuild build-for-testing \
             -project IBOW.xcodeproj \
             -scheme IBOW \
-            -destination "platform=iOS Simulator,name=${{ steps.sim.outputs.name }}" \
-            -resultBundlePath TestResults.xcresult \
+            -destination "id=$UDID" \
             -enableCodeCoverage YES
+      - name: Run tests (one retry if the runner crashes)
+        timeout-minutes: 20
+        run: |
+          set -o pipefail
+          for attempt in 1 2; do
+            rm -rf TestResults.xcresult
+            if xcodebuild test-without-building \
+              -project IBOW.xcodeproj \
+              -scheme IBOW \
+              -destination "id=$UDID" \
+              -resultBundlePath TestResults.xcresult \
+              -enableCodeCoverage YES; then
+              exit 0
+            fi
+            echo "Attempt $attempt failed"
+            xcrun simctl shutdown all || true
+            xcrun simctl boot "$UDID" || true
+            xcrun simctl bootstatus "$UDID" -b
+          done
+          exit 1
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v5
