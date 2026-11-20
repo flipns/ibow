@@ -51,7 +51,8 @@ public struct CloudLayer: Sendable, Hashable {
 }
 
 public struct Metar: Sendable, Hashable, Identifiable {
-    public var id: String { "\(station.value)-\(observedAt.timeIntervalSince1970)" }
+    /// Stable identity: one entry per station, survives refreshes (selection keeps working).
+    public var id: ICAOCode { station }
 
     public let station: ICAOCode
     public let name: String?

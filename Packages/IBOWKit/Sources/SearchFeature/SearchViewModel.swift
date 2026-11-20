@@ -20,6 +20,12 @@ public final class SearchViewModel {
     }
 
     public private(set) var state: State = .idle
+
+    /// Lookup used by the shell to resolve the current selection into a report.
+    public func metar(for code: ICAOCode?) -> Metar? {
+        guard let code, case .results(let metars) = state else { return nil }
+        return metars.first { $0.station == code }
+    }
     public var query: String = "" {
         didSet { if query != oldValue { schedule(debounced: true) } }
     }
@@ -43,8 +49,14 @@ public final class SearchViewModel {
         self.search = search
     }
 
-    /// Keyboard "search" key / pull-to-refresh: no debounce.
+    /// Keyboard "search" key: no debounce.
     public func submit() { schedule(debounced: false) }
+
+    /// Pull-to-refresh: suspends until the request finishes so the spinner is accurate.
+    public func refresh() async {
+        schedule(debounced: false)
+        await task?.value
+    }
 
     private func schedule(debounced: Bool) {
         task?.cancel()

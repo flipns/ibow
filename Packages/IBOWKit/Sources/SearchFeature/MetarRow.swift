@@ -3,11 +3,14 @@ import SwiftUI
 import WeatherDomain
 import WeatherPresentation
 
+/// Row content only. Tapping/selection is owned by the enclosing `List(selection:)`,
+/// which also gives push navigation when `NavigationSplitView` collapses to compact width.
 struct MetarRow: View {
     let metar: Metar
+    let isSelected: Bool
 
     var body: some View {
-        GlassCard {
+        GlassCard(isSelected ? .accent : .standard) {
             VStack(alignment: .leading, spacing: DS.Spacing.sm) {
                 HStack(alignment: .firstTextBaseline) {
                     Text(metar.station.value)
@@ -29,12 +32,16 @@ struct MetarRow: View {
         }
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(metar.spokenSummary)
-        .accessibilityAddTraits(.isButton)
         .accessibilityHint("Abre el METAR completo")
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     @ViewBuilder private var details: some View {
-        if let wind = metar.wind { Label(wind.shortDescription, systemImage: "wind") }
-        if let temp = metar.temperatureText { Label(temp, systemImage: "thermometer.medium") }
+        if let wind = metar.wind {
+            Label { Text(wind.shortDescription) } icon: { Image(systemName: "wind").foregroundStyle(Palette.primary.color) }
+        }
+        if let temp = metar.temperatureText {
+            Label { Text(temp) } icon: { Image(systemName: "thermometer.medium").foregroundStyle(Palette.illusOrange.color) }
+        }
     }
 }
