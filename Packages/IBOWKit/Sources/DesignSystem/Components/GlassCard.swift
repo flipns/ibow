@@ -13,6 +13,7 @@ public nonisolated enum GlassTier: Sendable {
 /// colours into flat grey on a dark base, while a plain translucent fill lets the blobs tint the card.
 public struct GlassCard<Content: View>: View {
     @Environment(\.accessibilityReduceTransparency) private var reduceTransparency
+    @Environment(\.colorSchemeContrast) private var contrast
     private let tier: GlassTier
     private let content: Content
 
@@ -33,6 +34,15 @@ public struct GlassCard<Content: View>: View {
     }
 
     @ViewBuilder private func border(_ shape: RoundedRectangle) -> some View {
+        if contrast == .increased {
+            // HIG: provide a higher-contrast scheme when Increase Contrast is on.
+            shape.strokeBorder(Color.white.opacity(0.85), lineWidth: 1.5)
+        } else {
+            tierBorder(shape)
+        }
+    }
+
+    @ViewBuilder private func tierBorder(_ shape: RoundedRectangle) -> some View {
         switch tier {
         case .accent: shape.strokeBorder(DS.Color.borderAccent, lineWidth: 1)
         case .outlined: shape.strokeBorder(Palette.primary.color.opacity(0.75), lineWidth: 1.5)
