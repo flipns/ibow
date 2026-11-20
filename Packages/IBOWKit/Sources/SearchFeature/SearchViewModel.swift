@@ -49,6 +49,20 @@ public final class SearchViewModel {
         self.search = search
     }
 
+    private var typedCodes: [String] {
+        query.split(whereSeparator: { !($0.isLetter || $0.isNumber) }).map { $0.uppercased() }
+    }
+
+    public func isSelected(code: String) -> Bool { typedCodes.contains(code.uppercased()) }
+
+    /// Quick-airport chips: adds the code to the query, or removes it if already there.
+    public func toggle(code: String) {
+        var codes = typedCodes
+        let code = code.uppercased()
+        if let index = codes.firstIndex(of: code) { codes.remove(at: index) } else { codes.append(code) }
+        query = codes.joined(separator: ", ")
+    }
+
     /// Keyboard "search" key: no debounce.
     public func submit() { schedule(debounced: false) }
 

@@ -151,4 +151,17 @@ struct SearchViewModelTests {
 
         #expect(await gate.started.isEmpty)
     }
+
+    @Test func quickChipTogglesCodeInTheQuery() {
+        let sut = SearchViewModel(debounce: .zero, sleep: { _ in }, search: { _ in [] })
+
+        sut.toggle(code: "lemd")
+        sut.toggle(code: "LEBL")
+        #expect(sut.query == "LEMD, LEBL")
+        #expect(sut.isSelected(code: "LEMD"))
+
+        sut.toggle(code: "LEMD")
+        #expect(sut.query == "LEBL")
+        #expect(!sut.isSelected(code: "LEMD"))
+    }
 }
