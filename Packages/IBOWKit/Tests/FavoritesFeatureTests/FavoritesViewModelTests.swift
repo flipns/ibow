@@ -51,7 +51,7 @@ struct FavoritesViewModelTests {
         #expect(sut.state == .loaded)
     }
 
-    @Test func toggleAddsAndPersists() async {
+    @Test func toggleAddsAndPersists() async throws {
         let repo = FakeFavorites()
         let sut = makeSUT(repo)
         await sut.toggle(lemd)
@@ -59,7 +59,7 @@ struct FavoritesViewModelTests {
         #expect(try await repo.favorites() == [lemd])
     }
 
-    @Test func toggleRemoves() async {
+    @Test func toggleRemoves() async throws {
         let repo = FakeFavorites([lemd])
         let sut = makeSUT(repo)
         await sut.load()
@@ -90,7 +90,7 @@ struct FavoritesViewModelTests {
         #expect(sut.state == .failed(.network))
     }
 
-    @Test func rapidTogglesReachTheStoreInOrder() async {
+    @Test func rapidTogglesReachTheStoreInOrder() async throws {
         let repo = FakeFavorites()
         let sut = makeSUT(repo)
         // Fire without awaiting between taps, like a user double-tapping the star.
