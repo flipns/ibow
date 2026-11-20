@@ -82,7 +82,7 @@ public struct SearchView: View {
             HStack(spacing: DS.Spacing.sm) {
                 Image(systemName: "magnifyingglass").accessibilityHidden(true)
                 TextField("LEMD, LEBL, LEPA", text: $viewModel.query)
-                    .frame(minHeight: 44) it
+                    .frame(minHeight: 44)
                     #if os(iOS)
                     .textInputAutocapitalization(.characters)
                     #endif

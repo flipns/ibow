@@ -32,6 +32,8 @@ jobs:
           NAME=$(xcrun simctl list devices available | grep -m1 -oE 'iPhone [^(]+' | sed 's/ *$//')
           echo "name=$NAME" >> "$GITHUB_OUTPUT"
           echo "Using simulator: $NAME"
+      - name: Use the on-screen keyboard (UI tests type into the search field)
+        run: defaults write com.apple.iphonesimulator ConnectHardwareKeyboard -bool false
       - name: xcodebuild test
         run: |
           set -o pipefail
