@@ -10,6 +10,7 @@ let package = Package(
         .library(name: "DesignSystem", targets: ["DesignSystem"]),
         .library(name: "WeatherPresentation", targets: ["WeatherPresentation"]),
         .library(name: "SearchFeature", targets: ["SearchFeature"]),
+        .library(name: "DetailFeature", targets: ["DetailFeature"]),
     ],
     targets: [
         // Pure Swift: entities, ports (protocols), use cases. No framework deps.
@@ -33,6 +34,12 @@ let package = Package(
         // Feature: search screen. Knows the Domain, never the Data layer.
         .target(
             name: "SearchFeature",
+            dependencies: ["WeatherDomain", "DesignSystem", "WeatherPresentation"],
+            swiftSettings: [.defaultIsolation(MainActor.self)]
+        ),
+        // Feature: METAR detail + interactive reader. Independent from SearchFeature.
+        .target(
+            name: "DetailFeature",
             dependencies: ["WeatherDomain", "DesignSystem", "WeatherPresentation"],
             swiftSettings: [.defaultIsolation(MainActor.self)]
         ),
