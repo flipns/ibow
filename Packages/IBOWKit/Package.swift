@@ -11,6 +11,7 @@ let package = Package(
         .library(name: "WeatherPresentation", targets: ["WeatherPresentation"]),
         .library(name: "SearchFeature", targets: ["SearchFeature"]),
         .library(name: "DetailFeature", targets: ["DetailFeature"]),
+        .library(name: "FavoritesFeature", targets: ["FavoritesFeature"]),
     ],
     targets: [
         // Pure Swift: entities, ports (protocols), use cases. No framework deps.
@@ -43,11 +44,18 @@ let package = Package(
             dependencies: ["WeatherDomain", "DesignSystem", "WeatherPresentation"],
             swiftSettings: [.defaultIsolation(MainActor.self)]
         ),
+        // Feature: favorites list + the shared favorites state (star in detail). Independent from Search/Detail.
+        .target(
+            name: "FavoritesFeature",
+            dependencies: ["WeatherDomain", "DesignSystem", "WeatherPresentation"],
+            swiftSettings: [.defaultIsolation(MainActor.self)]
+        ),
 
         .testTarget(name: "WeatherDomainTests", dependencies: ["WeatherDomain"]),
         .testTarget(name: "WeatherDataTests", dependencies: ["WeatherData", "WeatherDomain"]),
         .testTarget(name: "DesignSystemTests", dependencies: ["DesignSystem"]),
         .testTarget(name: "WeatherPresentationTests", dependencies: ["WeatherPresentation", "WeatherDomain"]),
         .testTarget(name: "SearchFeatureTests", dependencies: ["SearchFeature", "WeatherDomain"]),
+        .testTarget(name: "FavoritesFeatureTests", dependencies: ["FavoritesFeature", "WeatherDomain"]),
     ]
 )

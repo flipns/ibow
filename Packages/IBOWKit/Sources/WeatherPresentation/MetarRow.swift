@@ -1,15 +1,19 @@
 import DesignSystem
 import SwiftUI
 import WeatherDomain
-import WeatherPresentation
 
 /// Row content only. Tapping/selection is owned by the enclosing `List(selection:)`,
 /// which also gives push navigation when `NavigationSplitView` collapses to compact width.
-struct MetarRow: View {
+public struct MetarRow: View {
     let metar: Metar
     let isSelected: Bool
 
-    var body: some View {
+    public init(metar: Metar, isSelected: Bool) {
+        self.metar = metar
+        self.isSelected = isSelected
+    }
+
+    public var body: some View {
         GlassCard(isSelected ? .accent : .standard) {
             VStack(alignment: .leading, spacing: DS.Spacing.sm) {
                 HStack(alignment: .firstTextBaseline) {

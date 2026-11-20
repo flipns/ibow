@@ -1,6 +1,7 @@
 import DesignSystem
 import SwiftUI
 import WeatherDomain
+import WeatherPresentation
 
 /// Sidebar/root column of the app's `NavigationSplitView`.
 /// Uses `List(selection:)` so that selection pushes the detail on compact width
