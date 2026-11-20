@@ -1,0 +1,22 @@
+# TestFlight delivery — intentionally disabled (rename to release.yml to enable).
+# Requires repository secrets (never commit them):
+#   APP_STORE_CONNECT_API_KEY_ID, APP_STORE_CONNECT_ISSUER_ID, APP_STORE_CONNECT_API_KEY (p8 content),
+#   DISTRIBUTION_CERT_P12, DISTRIBUTION_CERT_PASSWORD, PROVISIONING_PROFILE
+# Alternative: Xcode Cloud workflow triggered on tags, which needs no secrets in the repo.
+name: Release (TestFlight)
+
+on:
+  push:
+    tags: ["v*"]
+
+jobs:
+  testflight:
+    runs-on: xcode-27
+    steps:
+      - uses: actions/checkout@v4
+      - name: Archive
+        run: |
+          xcodebuild archive -project IBOW.xcodeproj -scheme IBOW \
+            -destination 'generic/platform=iOS' -archivePath build/IBOW.xcarchive
+      # Export + upload steps (xcodebuild -exportArchive, xcrun altool / fastlane pilot) go here,
+      # using the secrets listed above.
