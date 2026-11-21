@@ -9,6 +9,7 @@ import WeatherDomain
 struct IBOWApp: App {
     private let searchUseCase: SearchMetarsUseCase
     private let favorites: FavoritesViewModel
+    private let cache: CachedWeatherRepository
 
     init() {
         FontRegistry.registerIfNeeded()
@@ -16,6 +17,7 @@ struct IBOWApp: App {
         let isUITesting = ProcessInfo.processInfo.arguments.contains("-ui-testing")
         let remote: any WeatherRepository = isUITesting ? FixtureWeatherRepository() : RemoteWeatherRepository()
         let cached = CachedWeatherRepository(base: remote)
+        cache = cached
         searchUseCase = SearchMetarsUseCase(repository: cached)
 
         let store: any FavoritesRepository
@@ -31,7 +33,9 @@ struct IBOWApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView(searchUseCase: searchUseCase, favorites: favorites)
+            ContentView(searchUseCase: searchUseCase, favorites: favorites) { [cache] in
+                await cache.invalidate()
+            }
                 .preferredColorScheme(.dark)
         }
     }

@@ -16,6 +16,9 @@ public struct CachedWeatherRepository: WeatherRepository {
         self.init(base: base, cache: TTLCache(ttl: ttl))
     }
 
+    /// Forgets every cached response (used by the explicit "refresh" action).
+    public func invalidate() async { await cache.removeAll() }
+
     public func metars(for codes: [ICAOCode]) async throws -> [Metar] {
         let key = codes.map(\.value).sorted().joined(separator: ",")
         if let hit = await cache.value(for: key) { return hit }

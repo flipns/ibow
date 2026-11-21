@@ -11,9 +11,13 @@ struct ContentView: View {
     @State private var selection: ICAOCode?
     @State private var favoritesSelection: ICAOCode?
 
-    init(searchUseCase: SearchMetarsUseCase, favorites: FavoritesViewModel) {
+    init(
+        searchUseCase: SearchMetarsUseCase,
+        favorites: FavoritesViewModel,
+        invalidateCache: @escaping @Sendable () async -> Void
+    ) {
         _favorites = State(initialValue: favorites)
-        _viewModel = State(initialValue: SearchViewModel { query in
+        _viewModel = State(initialValue: SearchViewModel(invalidate: invalidateCache) { query in
             try await searchUseCase(query: query)
         })
     }
@@ -24,6 +28,7 @@ struct ContentView: View {
             Tab("Favoritos", systemImage: "star") { favoritesTab }
         }
         .tint(DS.Color.primary)
+        .task { await favorites.load() }   // so the detail's star is right before the Favorites tab is opened
     }
 
     /// `NavigationSplitView` collapses to a stack on compact width (iPhone, Duo outer display)
