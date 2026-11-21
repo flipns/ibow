@@ -55,9 +55,10 @@ de modo que **el compilador impide** las dependencias que no deben existir.
 
 ### Decisiones
 
-**MVVM sin TCA.** Dos pantallas no justifican una dependencia y una curva de aprendizaje adicionales. El
-`SearchViewModel` (`@Observable`) concentra la lógica con estado y concurrencia para poder probarla sin UI;
-la vista de detalle es una vista "tonta" que recibe un `Metar`.
+**MVVM con `@Observable`.** La lógica con estado y concurrencia vive en view models (`SearchViewModel`,
+`FavoritesViewModel`) que dependen de puertos del dominio y se prueban sin UI. Las vistas son simples:
+el detalle recibe un `Metar` y los callbacks que necesita. El alcance es pequeño y MVVM nativo basta,
+sin dependencias de terceros.
 
 **Un paquete con varios targets, no un paquete por módulo.** Se obtiene el aislamiento de capas verificado por el
 compilador sin el coste de mantener muchos `Package.swift`. En un proyecto mayor, cada feature podría
