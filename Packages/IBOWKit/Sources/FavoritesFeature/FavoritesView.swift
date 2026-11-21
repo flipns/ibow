@@ -79,7 +79,7 @@ public struct FavoritesView: View {
 
     static func text(for error: WeatherError) -> String {
         switch error {
-        case .network: "Sin conexión. Desliza hacia abajo para reintentar."
+        case .network: "No se pudo contactar con el servicio. Desliza hacia abajo para reintentar."
         case .server(let code): "El servicio respondió con un error (\(code))."
         default: "No se pudieron cargar tus favoritos."
         }

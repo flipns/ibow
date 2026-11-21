@@ -14,7 +14,7 @@ nonisolated struct FixtureWeatherRepository: WeatherRepository {
         return codes.map { code in
             Metar(station: code, name: "\(code.value) Fixture Airport", observedAt: observedAt,
                   rawText: "METAR \(code.value) \(zulu) 24015KT 9999 FEW040 12/08 Q1018",
-                  temperatureC: 12, dewpointC: 8, wind: nil, visibility: nil, altimeterHPa: 1018, clouds: [],
+                  temperatureC: 12, dewpointC: 8, wind: nil, visibility: nil, altimeterHPa: 1018, clouds: [CloudLayer(cover: .few, baseFeet: 4000)],
                   weather: nil, flightCategory: .vfr, latitude: nil, longitude: nil, elevationMeters: nil)
         }
     }
