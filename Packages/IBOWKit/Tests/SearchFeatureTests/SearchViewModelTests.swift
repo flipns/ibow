@@ -20,6 +20,11 @@ private actor GatedSearch {
     func fail(_ query: String, with error: Error) { waiters.removeValue(forKey: query)?.resume(throwing: error) }
 }
 
+private actor Recorder {
+    private(set) var events: [String] = []
+    func add(_ event: String) { events.append(event) }
+}
+
 private func metar(_ code: String) -> Metar {
     Metar(station: ICAOCode(code)!, name: nil, observedAt: .distantPast, rawText: code,
           temperatureC: nil, dewpointC: nil, wind: nil, visibility: nil, altimeterHPa: nil, clouds: [],
@@ -163,5 +168,89 @@ struct SearchViewModelTests {
         sut.toggle(code: "LEMD")
         #expect(sut.query == "LEBL")
         #expect(!sut.isSelected(code: "LEMD"))
+    }
+
+    @Test func partialCodeWhileTypingIsNotAnError() async {
+        let gate = GatedSearch()
+        let sut = makeSUT(gate)
+
+        sut.query = "LEM"
+        #expect(sut.state == .idle)
+        sut.query = "LEMD, L"
+        #expect(sut.state == .idle)
+
+        await Task.yield()
+        #expect(await gate.started.isEmpty)
+    }
+
+    @Test func completingTheCodeSearchesAfterAPartialOne() async {
+        let gate = GatedSearch()
+        let sut = makeSUT(gate)
+
+        sut.query = "LEM"
+        sut.query = "LEMD"
+
+        #expect(await eventually { await gate.started == ["LEMD"] })
+        await gate.finish("LEMD", with: [metar("LEMD")])
+        #expect(await eventually { sut.state == .results([metar("LEMD")]) })
+    }
+
+    @Test func partialCodeLeavesALoadingStateBehind() async {
+        let gate = GatedSearch()
+        let sut = makeSUT(gate)
+
+        sut.query = "LEMD"
+        #expect(await eventually { await gate.started == ["LEMD"] })
+        sut.query = "LEMD, L"          // the in-flight search is dropped; state must not stay `.loading`
+        #expect(sut.state == .idle)
+        await gate.finish("LEMD", with: [metar("LEMD")])
+        await Task.yield()
+
+        #expect(sut.state == .idle)
+    }
+
+    @Test func explicitSubmitReportsAnInvalidCode() async {
+        let sut = SearchViewModel(debounce: .zero, sleep: { _ in }, search: { query in
+            _ = try AirportQuery.parse(query)
+            return []
+        })
+
+        sut.query = "LEM"
+        sut.submit()
+
+        #expect(await eventually { sut.state == .failed(.invalidCode("LEM")) })
+    }
+
+    @Test func refreshDropsTheCacheBeforeSearching() async {
+        let recorder = Recorder()
+        let sut = SearchViewModel(
+            debounce: .seconds(60),    // the typing debounce never fires: only `refresh` searches
+            sleep: { try await Task.sleep(for: $0) },
+            invalidate: { await recorder.add("invalidate") },
+            search: { _ in
+                await recorder.add("search")
+                return []
+            }
+        )
+
+        sut.query = "LEMD"
+        await sut.refresh()
+
+        #expect(await recorder.events == ["invalidate", "search"])
+        #expect(sut.state == .empty)
+    }
+
+    @Test func warnsWhenMoreCodesThanTheLimitAreTyped() {
+        let sut = SearchViewModel(debounce: .seconds(60), sleep: { try await Task.sleep(for: $0) }, search: { _ in [] })
+        let codes = (0..<AirportQuery.maxCodes + 1).map { "LE\(String(format: "%02d", $0))" }
+
+        sut.query = codes.prefix(AirportQuery.maxCodes).joined(separator: ", ")
+        #expect(!sut.exceedsCodeLimit)
+
+        sut.query = codes.joined(separator: ", ")
+        #expect(sut.exceedsCodeLimit)
+
+        sut.query = (codes.prefix(AirportQuery.maxCodes) + codes.prefix(3)).joined(separator: ", ")   // repeats do not count
+        #expect(!sut.exceedsCodeLimit)
     }
 }
