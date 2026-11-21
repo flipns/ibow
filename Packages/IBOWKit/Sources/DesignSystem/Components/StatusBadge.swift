@@ -27,7 +27,7 @@ public struct StatusBadge: View {
 
     public var body: some View {
         HStack(spacing: DS.Spacing.xs) {
-            if let systemImage { Image(systemName: systemImage).imageScale(.small) }
+            if let systemImage { Image(systemName: systemImage).imageScale(.small).accessibilityHidden(true) }
             Text(title)
         }
         .font(DS.Typography.labelSmall)

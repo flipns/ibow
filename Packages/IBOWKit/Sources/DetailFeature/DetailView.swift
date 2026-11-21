@@ -66,14 +66,17 @@ public struct DetailView: View {
     }
 
     private func observationLine(now: Date) -> String {
-        let time = metar.observedAt.formatted(Date.FormatStyle(date: .omitted, time: .shortened, timeZone: .gmt))
+        guard let observedAt = metar.observedAt else { return "Hora de observación desconocida" }
+        let time = observedAt.formatted(Date.FormatStyle(date: .omitted, time: .shortened, timeZone: .gmt))
         let base = "Observado a las \(time) UTC"
-        guard let age = ObservationAge.text(from: metar.observedAt, now: now) else { return base }
+        guard let age = ObservationAge.text(from: observedAt, now: now) else { return base }
         return "\(base) · \(age)"
     }
 
     private var hero: some View {
-        let isDaylight = Daylight.isDaylight(at: metar.observedAt, latitude: metar.latitude, longitude: metar.longitude)
+        let isDaylight = metar.observedAt.map {
+            Daylight.isDaylight(at: $0, latitude: metar.latitude, longitude: metar.longitude)
+        } ?? true
         return GlassCard(.accent) {
             VStack(alignment: .leading, spacing: DS.Spacing.sm) {
                 HStack(alignment: .top) {

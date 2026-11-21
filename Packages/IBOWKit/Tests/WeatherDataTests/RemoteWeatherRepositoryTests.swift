@@ -62,6 +62,15 @@ struct RemoteWeatherRepositoryTests {
         #expect(barcelona.flightCategory == .mvfr)
     }
 
+    @Test func missingObservationTimeIsNotInvented() async throws {
+        let json = #"[{"icaoId":"KCEW","rawOb":"KCEW 201253Z AUTO","clouds":[]}]"#
+        let sut = RemoteWeatherRepository(transport: StubTransport { _ in (Data(json.utf8), 200) })
+
+        let result = try await sut.metars(for: [ICAOCode("KCEW")!])
+
+        #expect(result.first?.observedAt == nil)
+    }
+
     @Test func noContentMeansNoResults() async throws {
         let sut = RemoteWeatherRepository(transport: StubTransport { _ in (Data(), 204) })
         #expect(try await sut.metars(for: [ICAOCode("LEMD")!]).isEmpty)

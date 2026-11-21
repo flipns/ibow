@@ -91,7 +91,7 @@ struct MetarDTO: Decodable, Sendable {
         return Metar(
             station: station,
             name: name,
-            observedAt: obsTime.map { Date(timeIntervalSince1970: $0) } ?? .distantPast,
+            observedAt: obsTime.map { Date(timeIntervalSince1970: $0) },
             rawText: rawOb,
             temperatureC: temp,
             dewpointC: dewp,

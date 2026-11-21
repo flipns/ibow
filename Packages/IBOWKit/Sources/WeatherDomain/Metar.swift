@@ -53,7 +53,8 @@ public struct Metar: Sendable, Hashable, Identifiable {
     public var id: ICAOCode { station }
     public let station: ICAOCode
     public let name: String?
-    public let observedAt: Date
+    /// `nil` when the report carries no observation time; never invented.
+    public let observedAt: Date?
     public let rawText: String
     public let temperatureC: Double?
     public let dewpointC: Double?
@@ -68,7 +69,7 @@ public struct Metar: Sendable, Hashable, Identifiable {
     public let elevationMeters: Double?
 
     public init(
-        station: ICAOCode, name: String?, observedAt: Date, rawText: String,
+        station: ICAOCode, name: String?, observedAt: Date?, rawText: String,
         temperatureC: Double?, dewpointC: Double?, wind: Wind?, visibility: Visibility?,
         altimeterHPa: Double?, clouds: [CloudLayer], weather: String?,
         flightCategory: FlightCategory, latitude: Double?, longitude: Double?,
