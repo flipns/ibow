@@ -76,7 +76,7 @@ public struct SearchView: View {
 
     private var searchField: some View {
         VStack(alignment: .leading, spacing: DS.Spacing.sm) {
-            Text("Códigos OACI, separados por comas")
+            Text("Códigos ICAO, separados por comas")
                 .font(DS.Typography.bodySmall)
                 .foregroundStyle(DS.Color.accentSoft)
             HStack(spacing: DS.Spacing.sm) {
@@ -137,7 +137,9 @@ public struct SearchView: View {
     }
 
     private func summary(_ metars: [Metar]) -> some View {
-        Text(metars.count == 1 ? "1 aeropuerto" : "\(metars.count) aeropuertos")
+        let count = metars.count == 1 ? "1 aeropuerto" : "\(metars.count) aeropuertos"
+        let limit = "\(count) · máximo \(AirportQuery.maxCodes) por búsqueda"
+        return Text(verbatim: viewModel.exceedsCodeLimit ? limit : count)
             .font(DS.Typography.bodySmall)
             .foregroundStyle(DS.Color.accentSoft)
             .frame(maxWidth: .infinity, alignment: .leading)
@@ -178,7 +180,7 @@ public struct SearchView: View {
     static func text(for error: WeatherError) -> String {
         switch error {
         case .invalidCode(let raw): "«\(raw)» no es un código ICAO válido (4 caracteres)."
-        case .network: "Sin conexión. Revisa tu red e inténtalo de nuevo."
+        case .network: "No se pudo contactar con el servicio. Inténtalo de nuevo."
         case .server(let code): "El servicio respondió con un error (\(code))."
         case .decoding: "La respuesta del servicio no se pudo leer."
         }

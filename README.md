@@ -30,7 +30,11 @@ variados (viento, visibilidad, nubes, fenómenos, categoría de vuelo). Los DTO 
   visibilidad, nubes, temperatura/rocío y QNH.
 - **Antigüedad del METAR**: «Observado a las 16:30 UTC · hace 12 min», que se actualiza cada minuto.
 - **Favoritos**: estrella en el detalle y pestaña propia, persistidos con SwiftData.
-- Pull-to-refresh, estados vacío / cargando / error con mensajes en lenguaje natural.
+- Pull-to-refresh y botón «Actualizar» (saltan la caché de 3 minutos), estados vacío / cargando / error con
+  mensajes en lenguaje natural. Mientras se teclea un código incompleto («LEM») no se muestra error; si hay más de
+  10 códigos se avisa de que solo se buscan los 10 primeros.
+- Un METAR sin datos (p. ej. una estación automática sin nubes) se muestra como «Sin dato», nunca como «Despejado»
+  ni leído como «0 grados» por VoiceOver.
 
 ## Arquitectura
 
@@ -135,7 +139,9 @@ Framework: Swift Testing para el paquete y la lógica; XCTest solo para UI.
 - Pestañas «Recientes» y «Ajustes» (unidades de viento/presión/temperatura) descartadas por ahora: el HIG pide pocas
   pestañas y ninguna a medio hacer.
 - Indicar en la UI si el dato viene de caché.
-- Soporte de iPhone Duo verificado con tamaños de clase; pendiente de probar en el simulador con el pliegue.
+- iPhone Duo: probado en el simulador (iOS 27.2) en pantalla exterior, interior y medio abierto; la selección se mantiene
+  al plegar. Detalles pendientes: la fila seleccionada no se resalta en la columna de lista y el detalle no limita
+  el ancho de lectura en la pantalla interior.
 - La API no devuelve pistas, por lo que no se calcula viento cruzado/de cara.
 
 ## Favoritos (SwiftData)

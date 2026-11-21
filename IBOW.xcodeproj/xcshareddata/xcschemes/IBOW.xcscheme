@@ -34,9 +34,65 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "1D98A0BC30AF6A5E00E2C419"
-               BuildableName = "IBOWTests.xctest"
-               ReferencedContainer = "container:IBOW.xcodeproj">
+               BlueprintIdentifier = "WeatherDomainTests"
+               BuildableName = "WeatherDomainTests"
+               BlueprintName = "WeatherDomainTests"
+               ReferencedContainer = "container:Packages/IBOWKit">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "WeatherDataTests"
+               BuildableName = "WeatherDataTests"
+               BlueprintName = "WeatherDataTests"
+               ReferencedContainer = "container:Packages/IBOWKit">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "WeatherPresentationTests"
+               BuildableName = "WeatherPresentationTests"
+               BlueprintName = "WeatherPresentationTests"
+               ReferencedContainer = "container:Packages/IBOWKit">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "DesignSystemTests"
+               BuildableName = "DesignSystemTests"
+               BlueprintName = "DesignSystemTests"
+               ReferencedContainer = "container:Packages/IBOWKit">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "SearchFeatureTests"
+               BuildableName = "SearchFeatureTests"
+               BlueprintName = "SearchFeatureTests"
+               ReferencedContainer = "container:Packages/IBOWKit">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO"
+            parallelizable = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "FavoritesFeatureTests"
+               BuildableName = "FavoritesFeatureTests"
+               BlueprintName = "FavoritesFeatureTests"
+               ReferencedContainer = "container:Packages/IBOWKit">
             </BuildableReference>
          </TestableReference>
          <TestableReference
