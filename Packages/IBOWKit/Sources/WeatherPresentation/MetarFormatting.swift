@@ -65,11 +65,11 @@ extension Metar {
 
 /// What a METAR says about the sky. A report with no cloud group at all is *not* a clear sky:
 /// only CAVOK, or an explicit "clear" layer, is.
-public enum SkyReport: Sendable, Equatable {
+public nonisolated enum SkyReport: Sendable, Equatable {
     case noData, clear, layers
 }
 
-extension Metar {
+nonisolated extension Metar {
     public var skyReport: SkyReport {
         if clouds.isEmpty {
             return rawText.uppercased().split(separator: " ").contains("CAVOK") ? .clear : .noData
