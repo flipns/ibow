@@ -197,9 +197,9 @@ public struct DetailView: View {
         let d = metar.dewpointC.map { Int($0.rounded()) }
         let margin = (t != nil && d != nil) ? "\(t! - d!)° de margen" : nil
         return Tile(title: "Temp / rocío", icon: "thermometer.medium", tint: Palette.illusOrange,
-                    value: "\(t.map(String.init) ?? "—")° / \(d.map(String.init) ?? "—")°",
+                    value: "\(t.map { "\($0)°" } ?? "—") / \(d.map { "\($0)°" } ?? "—")",
                     caption: margin,
-                    spoken: "temperatura \(t ?? 0) grados, punto de rocío \(d ?? 0)")
+                    spoken: metar.spokenTemperatureAndDewpoint)
     }
 
     private var pressureTile: some View {
@@ -207,16 +207,25 @@ public struct DetailView: View {
         return Tile(title: "QNH", icon: "gauge.medium", tint: Palette.illusViolet,
                     value: metar.altimeterHPa.map { "\(Int($0)) hPa" } ?? "—",
                     caption: trend.map { "Tendencia: \($0)" },
-                    spoken: "QNH \(Int(metar.altimeterHPa ?? 0)) hectopascales")
+                    spoken: metar.spokenPressure)
     }
 
     private var cloudsHeadline: String {
-        guard let lowest = metar.clouds.compactMap(\.baseFeet).min() else { return "Despejado" }
-        return "\(lowest) ft"
+        switch metar.skyReport {
+        case .noData: return "Sin dato"
+        case .clear: return "Despejado"
+        case .layers:
+            guard let lowest = metar.clouds.compactMap(\.baseFeet).min() else { return "—" }
+            return "\(lowest) ft"
+        }
     }
 
     private var cloudsText: String {
-        guard !metar.clouds.isEmpty else { return "Despejado" }
+        switch metar.skyReport {
+        case .noData: return "Sin dato"
+        case .clear: return "Despejado"
+        case .layers: break
+        }
         return metar.clouds.map { layer in
             let base = layer.baseFeet.map { "\($0) ft" } ?? ""
             return "\(layer.cover.abbreviation) \(base)".trimmingCharacters(in: .whitespaces)

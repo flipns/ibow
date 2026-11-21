@@ -37,8 +37,25 @@ struct WeatherConditionTests {
         #expect(WeatherCondition(metar(raw: "METAR LEBL 201030Z 32007KT CAVOK 15/07 Q1020")) == .clear)
     }
 
+    @Test func reportWithoutCloudGroupIsNotClearSky() {
+        // An automatic station that reports no sky data (e.g. KCEW) must not be shown as "clear".
+        let m = metar(raw: "METAR KCEW 201253Z AUTO RMK AO2")
+        #expect(m.skyReport == .noData)
+        #expect(WeatherCondition(m) == .noSkyData)
+    }
+
+    @Test func skyReportDistinguishesClearFromLayers() {
+        #expect(metar(raw: "METAR LEBL 201030Z 32007KT CAVOK 15/07 Q1020").skyReport == .clear)
+        #expect(metar(raw: "METAR KJFK 201251Z 00000KT 10SM CLR", clouds: [CloudLayer(cover: .clear, baseFeet: nil)]).skyReport == .clear)
+        #expect(metar(raw: "METAR LEMD 201030Z FEW013", clouds: [CloudLayer(cover: .few, baseFeet: 1300)]).skyReport == .layers)
+    }
+
+    @Test func precipitationStillWinsWithoutCloudData() {
+        #expect(WeatherCondition(metar(raw: "METAR KXXX 201253Z 2SM RA AUTO")) == .rain)
+    }
+
     @Test func everyConditionHasSymbolsAndSpeech() {
-        let all: [WeatherCondition] = [.clear, .fewClouds, .scattered, .broken, .overcast, .fog, .drizzle, .rain, .showers, .thunderstorm, .snow, .hail]
+        let all: [WeatherCondition] = [.clear, .fewClouds, .scattered, .broken, .overcast, .fog, .drizzle, .rain, .showers, .thunderstorm, .snow, .hail, .noSkyData]
         for c in all {
             #expect(!c.spokenName.isEmpty)
             #expect(!c.symbolName(isDaylight: true).isEmpty)

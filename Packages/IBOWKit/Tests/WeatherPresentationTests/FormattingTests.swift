@@ -1,3 +1,4 @@
+import Foundation
 import Testing
 import WeatherDomain
 @testable import WeatherPresentation
@@ -25,5 +26,22 @@ struct FormattingTests {
             #expect(!category.spokenName.isEmpty)
             #expect(!category.systemImage.isEmpty)
         }
+    }
+
+    @Test func missingValuesAreNeverSpokenAsZero() {
+        let none = Metar(station: ICAOCode("KCEW")!, name: nil, observedAt: .distantPast, rawText: "KCEW",
+                         temperatureC: nil, dewpointC: nil, wind: nil, visibility: nil, altimeterHPa: nil, clouds: [],
+                         weather: nil, flightCategory: .unknown, latitude: nil, longitude: nil, elevationMeters: nil)
+        #expect(none.spokenTemperatureAndDewpoint == "temperatura y punto de rocío sin dato")
+        #expect(none.spokenPressure == "QNH sin dato")
+        #expect(!none.spokenSummary.contains("grados"))
+    }
+
+    @Test func presentValuesAreSpoken() {
+        let full = Metar(station: ICAOCode("LEMD")!, name: nil, observedAt: .distantPast, rawText: "LEMD",
+                         temperatureC: 11.4, dewpointC: 8, wind: nil, visibility: nil, altimeterHPa: 1024, clouds: [],
+                         weather: nil, flightCategory: .vfr, latitude: nil, longitude: nil, elevationMeters: nil)
+        #expect(full.spokenTemperatureAndDewpoint == "temperatura 11 grados, punto de rocío 8 grados")
+        #expect(full.spokenPressure == "QNH 1024 hectopascales")
     }
 }

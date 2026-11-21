@@ -109,7 +109,7 @@ struct MetarDTO: Decodable, Sendable {
 
     private static func cover(_ raw: String?) -> CloudLayer.Cover {
         switch raw?.uppercased() {
-        case "CLR", "SKC", "NCD", "NSC": .clear
+        case "CLR", "SKC", "NCD", "NSC", "CAVOK": .clear
         case "FEW": .few
         case "SCT": .scattered
         case "BKN": .broken

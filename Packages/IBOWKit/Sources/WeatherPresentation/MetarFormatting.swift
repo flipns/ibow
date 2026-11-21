@@ -62,3 +62,30 @@ extension Metar {
         return parts.joined(separator: ". ")
     }
 }
+
+/// What a METAR says about the sky. A report with no cloud group at all is *not* a clear sky:
+/// only CAVOK, or an explicit "clear" layer, is.
+public enum SkyReport: Sendable, Equatable {
+    case noData, clear, layers
+}
+
+extension Metar {
+    public var skyReport: SkyReport {
+        if clouds.isEmpty {
+            return rawText.uppercased().split(separator: " ").contains("CAVOK") ? .clear : .noData
+        }
+        return clouds.allSatisfy { $0.cover == .clear } ? .clear : .layers
+    }
+
+    /// Spoken temperature and dew point; a missing value is left out, never read as zero.
+    public var spokenTemperatureAndDewpoint: String {
+        var parts: [String] = []
+        if let temperatureC { parts.append("temperatura \(Int(temperatureC.rounded())) grados") }
+        if let dewpointC { parts.append("punto de rocío \(Int(dewpointC.rounded())) grados") }
+        return parts.isEmpty ? "temperatura y punto de rocío sin dato" : parts.joined(separator: ", ")
+    }
+
+    public var spokenPressure: String {
+        altimeterHPa.map { "QNH \(Int($0)) hectopascales" } ?? "QNH sin dato"
+    }
+}

@@ -4,6 +4,7 @@ import WeatherDomain
 public nonisolated enum WeatherCondition: Sendable, Equatable {
     case clear, fewClouds, scattered, broken, overcast
     case fog, drizzle, rain, showers, thunderstorm, snow, hail
+    case noSkyData
 
     public init(_ metar: Metar) {
         let codes = Self.phenomena(in: metar)
@@ -14,6 +15,7 @@ public nonisolated enum WeatherCondition: Sendable, Equatable {
         else if codes.contains("RA") { self = .rain }
         else if codes.contains("DZ") { self = .drizzle }
         else if !codes.isDisjoint(with: ["FG", "BR", "HZ", "FU", "DU", "SA", "VA"]) { self = .fog }
+        else if metar.skyReport == .noData { self = .noSkyData }
         else {
             let order: [CloudLayer.Cover] = [.clear, .few, .scattered, .broken, .overcast]
             let rank = metar.clouds.map { layer -> Int in
@@ -53,6 +55,7 @@ public nonisolated enum WeatherCondition: Sendable, Equatable {
         case .thunderstorm: "tormenta"
         case .snow: "nieve"
         case .hail: "granizo"
+        case .noSkyData: "sin datos del cielo"
         }
     }
 
@@ -69,6 +72,7 @@ public nonisolated enum WeatherCondition: Sendable, Equatable {
         case .thunderstorm: "cloud.bolt.rain"
         case .snow: "cloud.snow"
         case .hail: "cloud.hail"
+        case .noSkyData: "questionmark.circle"
         }
     }
 }
